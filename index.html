@@ -5,12 +5,14 @@
 	<title>Zip漫画阅读器</title>
 	<!-- 加载JSZip库 -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
-	<script src="comic-reader.js"></script>
+	<!-- <script src="comic-reader.js"></script> -->
 </head>
 <body>
 	<canvas id="canvas" width="800" height="600"></canvas>
 	<script>
 		// 加载zip压缩包
+		var urlParams = new URLSearchParams(window.location.search);
+		var comicUrl = urlParams.get('comic_url');
 		var currentPage = 0;
 		var zip = new JSZip();
 		var imgList = [];
