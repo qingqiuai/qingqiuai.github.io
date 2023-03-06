@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Zip漫画阅读器</title>
+	<!-- 加载JSZip库 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+	<script src="comic-reader.js"></script>
+</head>
+<body>
+	<canvas id="canvas" width="800" height="600"></canvas>
+	<script>
+		// 加载zip压缩包
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', comicUrl, true);
+		xhr.responseType = 'arraybuffer';
+		xhr.onload = function() {
+			if (xhr.status === 200) {
+				// 解压缩zip文件
+				var zip = new JSZip();
+				zip.loadAsync(xhr.response).then(function(zip) {
+					// 获取漫画图片列表
+					var files = zip.file(/\.jpg$|\.png$/i);
+					// 逐个绘制漫画图片
+					var canvas = document.getElementById('canvas');
+					var ctx = canvas.getContext('2d');
+					var index = 0;
+					var drawImage = function() {
+						if (index < files.length) {
+							var file = files[index];
+							file.async('blob').then(function(blob) {
+								var img = new Image();
+								img.onload = function() {
+									// 绘制漫画图片
+									ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+									// 继续绘制下一张漫画图片
+									index++;
+									drawImage();
+								};
+								img.src = URL.createObjectURL(blob);
+							});
+						}
+					};
+					drawImage();
+				});
+			}
+		};
+		xhr.send();
+	</script>
+</body>
+</html>
