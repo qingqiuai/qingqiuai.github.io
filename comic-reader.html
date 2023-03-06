@@ -1,158 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>漫画预览</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<style>
-		body {
-			background-color: #f4f4f4;
-			margin: 0;
-			padding: 0;
-		}
-
-		h1 {
-			text-align: center;
-			margin-top: 20px;
-		}
-
-		#comic-container {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: center;
-			align-items: center;
-			margin: 20px;
-		}
-
-		#comic-container img {
-			max-width: 100%;
-			max-height: 100vh;
-			margin: 10px;
-			box-shadow: 2px 2px 5px #888888;
-		}
-
-		.loading {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
-			font-size: 20px;
-			color: #888888;
-		}
-
-		.loading::before {
-			content: "";
-			display: inline-block;
-			width: 20px;
-			height: 20px;
-			margin-right: 10px;
-			border-radius: 50%;
-			border: 2px solid #888888;
-			border-top-color: #ffffff;
-			animation: spin 1s linear infinite;
-		}
-
-		@keyframes spin {
-			to { transform: rotate(360deg); }
-		}
-	</style>
+    <meta charset="UTF-8">
+    <title>漫画阅读器</title>
+    <style>
+        #comic {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #comic img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
 </head>
 <body>
-	<h1>漫画预览</h1>
-	<div id="comic-container"></div>
-	<div id="loading" class="loading">正在加载...</div>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
-	<script>
-    // 解析URL参数
-    var urlParams = new URLSearchParams(window.location.search);
-    var comicUrl = urlParams.get('comic_url');
+    <div id="comic"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <script src="comic-reader.js"></script>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var pageIndex = 1;
+        var pageCount = 10;
 
-    // 加载漫画文件
-    // loadComic(comicUrl);
+        var comic = document.getElementById("comic");
 
-    // 加载漫画文件
-    // function loadComic(url) {
-      // 通过JavaScript创建一个<iframe>标签，并将漫画文件的URL作为src属性值
-      // var iframe = document.createElement('iframe');
-      // iframe.src = url;
-      // 将<iframe>标签添加到DOM树中，使其可以显示漫画
-      // document.body.appendChild(iframe);
-    // }
-		// 获取zip漫画文件的url
-		// var comicUrl = "https://example.com/comic.zip";
+        function loadPage(index) {
+            var url = "page" + index + ".jpg";
+            var img = new Image();
+            img.onload = function() {
+                comic.innerHTML = "";
+                comic.appendChild(img);
+            };
+            img.onerror = function() {
+                alert("加载失败");
+            };
+            img.src = url;
+        }
 
-		// 创建JSZip对象
-		var zip = new JSZip();
+        function nextPage() {
+            if (pageIndex < pageCount) {
+                pageIndex++;
+                loadPage(pageIndex);
+            }
+        }
 
-		// 获取漫画容器和加载动画
-		var comicContainer = document.getElementById("comic-container");
-		var loading = document.getElementById("loading");
+        function prevPage() {
+            if (pageIndex > 1) {
+                pageIndex--;
+                loadPage(pageIndex);
+            }
+        }
 
-		// 隐藏漫画容器
-		comicContainer.style.display = "none";
+        function loadComic(comicUrl) {
+            fetch(comicUrl)
+                .then(function(response) {
+                    return response.blob();
+                })
+                .then(function(blob) {
+                    return JSZip.loadAsync(blob);
+                })
+                .then(function(zip) {
+                    pageCount = Object.keys(zip.files).length;
+                    // 遍历 ZIP 文件中的每个文件，将漫画页面添加到页面中
+                    var promises = [];
+                    zip.forEach(function(relativePath, zipEntry) {
+                        if (!zipEntry.dir) {
+                            var promise = zipEntry.async("base64").then(function(data) {
+                                var url = "data:image/jpeg;base64," + data;
+                                var img = new Image();
+                                img.src = url;
+                                return img;
+                            });
+                            promises.push(promise);
+                        }
+                    });
+                    Promise.all(promises).then(function(images) {
+                        // 将漫画页面添加到页面中
+                        for (var i = 0; i < images.length; i++) {
+                            var div = document.createElement("div");
+                            div.appendChild(images[i]);
+                            document.body.appendChild(div);
+                        }
+                        loadPage(pageIndex);
+                    });
+                })
+                .catch(function(error) {
+                    alert("加载漫画失败：" + error.message);
+                });
+        }
 
-		// 创建XMLHttpRequest对象
-		var xhr = new XMLHttpRequest();
+        loadComic(comicUrl);
 
-		// 发送GET请求，获取zip漫画文件
-		xhr.open("GET", comicUrl, true);
-		xhr.responseType = "arraybuffer";
-
-		// 监听XMLHttpRequest对象的加载事件
-		xhr.onload = function() {
-			if(xhr.status === 200) {
-				// 解压缩zip漫画文件
-				zip.loadAsync(xhr.response).then(function() {
-					var files = Object.keys(zip.files);
-
-					// 遍历zip漫画文件中的所有图片文件
-					for(var i = 0; i < files.length; i++) {
-						var file = zip.files[files[i]];
-
-						if(file.dir) {
-							continue;
-						}
-
-						// 将图片文件转换为base64编码
-						var imageData = "data:image/jpeg;base64," + btoa(file._data);
-
-						// 创建img标签，展示图片预览
-						var img = document.createElement("img");
-						img.src = imageData;
-
-						// 将img标签添加到漫画容器中
-						comicContainer.appendChild(img);
-					}
-
-					// 隐藏加载动画，显示漫画容器
-					loading.style.display = "none";
-					comicContainer.style.display = "flex";
-				}).catch(function(err) {
-					// 显示错误信息
-					comicContainer.innerHTML = "解压缩失败，请检查zip文件格式。";
-					comicContainer.style.display = "block";
-					loading.style.display = "none";
-					throw err;
-				});
-			} else {
-				// 显示错误信息
-				comicContainer.innerHTML = "加载失败，请重试。";
-				comicContainer.style.display = "block";
-				loading.style.display = "none";
-			}
-		};
-
-		// 监听XMLHttpRequest对象的错误事件
-		xhr.onerror = function() {
-			// 显示错误信息
-			comicContainer.innerHTML = "网络错误，请检查你的网络连接。";
-			comicContainer.style.display = "block";
-			loading.style.display = "none";
-		};
-
-		// 发送XMLHttpRequest请求
-		xhr.send();
-	</script>
+        document.addEventListener("keydown", function(event) {
+            if (event.keyCode === 37) { // 左箭头
+                prevPage();
+            } else if (event.keyCode === 39) { // 右箭头
+                nextPage();
+            }
+        });
+    </script>
 </body>
 </html>
