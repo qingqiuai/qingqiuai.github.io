@@ -35,38 +35,47 @@
 					return a.localeCompare(b);
 				});
 
-				// 显示第一页
-				showPage(currentPage, imgList);
+				// 显示所有图片
+				showAllPages(imgList);
 			});
 		});
+
+		// 显示所有图片
+		function showAllPages(imgList) {
+			var comic = document.getElementById('comic');
+			for (var i = 0; i < imgList.length; i++) {
+				var imgName = imgList[i];
+				zip.file(imgName).async("base64").then(function (data) {
+					var img = document.createElement('img');
+					img.src = 'data:image/jpeg;base64,' + data;
+					comic.appendChild(img);
+				});
+			}
+		}
+
+		// 监听键盘事件
+		document.onkeydown = function(event) {
+			event = event || window.event;
+			switch (event.keyCode) {
+				case 37: // 左箭头
+					showPage(currentPage - 1, imgList);
+					break;
+				case 39: // 右箭头
+					showPage(currentPage + 1, imgList);
+					break;
+			}
+		};
 
 		// 显示指定页数的图片
 		function showPage(pageNum, imgList) {
 			if (pageNum < 0 || pageNum >= imgList.length) return;
 			currentPage = pageNum;
 			var imgName = imgList[pageNum];
-			zip.file(imgName).async("base64").then(function (data) {
-				var img = document.createElement('img');
-				img.src = 'data:image/jpeg;base64,' + data;
-				document.getElementById('comic').appendChild(img);
-			});
-
-			// 滚动到当前页
-			var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-			if (scrollTop > 0) {
-				var imgHeight = window.innerHeight;
-				window.scrollTo(0, scrollTop + imgHeight);
+			var img = document.querySelector('img[src^="data:image/jpeg;base64"][src*="' + imgName + '"]');
+			if (img) {
+				img.scrollIntoView();
 			}
 		}
-
-		// 监听滚动事件
-		window.onscroll = function() {
-			var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-			var imgHeight = window.innerHeight;
-			if (scrollTop + imgHeight >= document.documentElement.scrollHeight) {
-				showPage(currentPage + 1, imgList);
-			}
-		};
 	</script>
 </body>
 </html>
