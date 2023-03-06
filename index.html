@@ -11,41 +11,62 @@
 	<canvas id="canvas" width="800" height="600"></canvas>
 	<script>
 		// 加载zip压缩包
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', comicUrl, true);
-		xhr.responseType = 'arraybuffer';
-		xhr.onload = function() {
-			if (xhr.status === 200) {
-				// 解压缩zip文件
-				var zip = new JSZip();
-				zip.loadAsync(xhr.response).then(function(zip) {
-					// 获取漫画图片列表
-					var files = zip.file(/\.jpg$|\.png$/i);
-					// 逐个绘制漫画图片
-					var canvas = document.getElementById('canvas');
-					var ctx = canvas.getContext('2d');
-					var index = 0;
-					var drawImage = function() {
-						if (index < files.length) {
-							var file = files[index];
-							file.async('blob').then(function(blob) {
-								var img = new Image();
-								img.onload = function() {
-									// 绘制漫画图片
-									ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-									// 继续绘制下一张漫画图片
-									index++;
-									drawImage();
-								};
-								img.src = URL.createObjectURL(blob);
-							});
-						}
-					};
-					drawImage();
+		var currentPage = 0;
+		var zip = new JSZip();
+		var imgList = [];
+
+		// 加载zip文件
+		JSZipUtils.getBinaryContent(comicUrl, function(err, data) {
+			if (err) {
+				console.log(err);
+				return;
+			}
+			zip.loadAsync(data).then(function() {
+				// 获取zip文件中的图片列表
+				zip.forEach(function (relativePath, file) {
+					if (file.dir) return;
+					if (/\.(jpg|png|gif)$/i.test(relativePath)) {
+						imgList.push(relativePath);
+					}
 				});
+
+				// 按文件名排序
+				imgList.sort(function(a, b) {
+					return a.localeCompare(b);
+				});
+
+				// 显示第一页
+				showPage(currentPage, imgList);
+			});
+		});
+
+		// 显示指定页数的图片
+		function showPage(pageNum, imgList) {
+			if (pageNum < 0 || pageNum >= imgList.length) return;
+			currentPage = pageNum;
+			var imgName = imgList[pageNum];
+			zip.file(imgName).async("base64").then(function (data) {
+				var img = document.createElement('img');
+				img.src = 'data:image/jpeg;base64,' + data;
+				document.getElementById('comic').appendChild(img);
+			});
+
+			// 滚动到当前页
+			var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+			if (scrollTop > 0) {
+				var imgHeight = window.innerHeight;
+				window.scrollTo(0, scrollTop + imgHeight);
+			}
+		}
+
+		// 监听滚动事件
+		window.onscroll = function() {
+			var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+			var imgHeight = window.innerHeight;
+			if (scrollTop + imgHeight >= document.documentElement.scrollHeight) {
+				showPage(currentPage + 1, imgList);
 			}
 		};
-		xhr.send();
 	</script>
 </body>
 </html>
