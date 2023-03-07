@@ -8,7 +8,7 @@ if (!comicUrl) {
 }
 
 // 加载漫画文件
-loadComic(comicUrl);
+// loadComic(comicUrl);
 
 // 加载漫画文件
 // function loadComic(url) {
