@@ -85,10 +85,10 @@
                     Promise.all(promises).then(function(images) {
                         // 将漫画页面添加到页面中
                         for (var i = 0; i < images.length; i++) {
-                            var div = document.getElementById("img-list");
+                            var divid = document.getElementById("img-list");
                             var div = document.createElement("div");
                             div.appendChild(images[i]);
-                            document.body.appendChild(div);
+                            document.body.appendChild(div, divid);
                         }
                         loadPage(pageIndex);
                     });
