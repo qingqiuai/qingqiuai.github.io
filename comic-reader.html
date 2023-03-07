@@ -23,6 +23,7 @@
 </head>
 <body>
     <div id="comic"></div>
+    <div id="img-list"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
     <script src="comic-reader.js"></script>
     <script>
@@ -85,12 +86,9 @@
                     Promise.all(promises).then(function(images) {
                         // 将漫画页面添加到页面中
                         for (var i = 0; i < images.length; i++) {
-                            
-                            var div = document.createElement("div");
+                            var div = document.createElement("div", {id : "img-list"});
                             div.appendChild(images[i]);
-                            var divid = document.getElementById("img-list");
-                            //document.body.appendChild(div);
-                            document.body.insertBefore(div, divid);
+                            document.body.appendChild(div);
                         }
                         loadPage(pageIndex);
                     });
