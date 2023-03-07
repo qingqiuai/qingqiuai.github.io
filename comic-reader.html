@@ -12,11 +12,11 @@
             align-items: center;
         }
         #comic img {
-            max-width: 750px;
+            max-width: 850px;
             max-height: 100%;
         }
         #div img-list {
-            width: 750px;
+            width: 850px;
             height: 100%;
         }
     </style>
@@ -85,10 +85,12 @@
                     Promise.all(promises).then(function(images) {
                         // 将漫画页面添加到页面中
                         for (var i = 0; i < images.length; i++) {
-                            var divid = document.getElementById("img-list");
+                            
                             var div = document.createElement("div");
                             div.appendChild(images[i]);
-                            document.body.appendChild(div, divid);
+                            var divid = document.getElementById("img-list");
+                            //document.body.appendChild(div);
+                            document.body.insertBefore(div, divid);
                         }
                         loadPage(pageIndex);
                     });
