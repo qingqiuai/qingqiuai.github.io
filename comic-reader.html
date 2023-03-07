@@ -29,7 +29,7 @@
         var comic = document.getElementById("comic");
 
         function loadPage(index) {
-            // var url = "page" + index + ".jpg";
+            var url = "page" + index + ".jpg";
             var img = new Image();
             img.onload = function() {
                 comic.innerHTML = "";
@@ -38,7 +38,7 @@
             img.onerror = function() {
                 alert("加载失败");
             };
-            // img.src = url;
+            img.src = url;
         }
 
         function nextPage() {
