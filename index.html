@@ -1,0 +1,71 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333333;
+        }
+        form {
+            width: 600px;
+            margin: 0 auto;
+        }
+        input[type=text] {
+            width: 500px;
+            height: 40px;
+            font-size: 20px;
+            border: 1px solid #cccccc;
+            padding: 10px;
+        }
+        input[type=submit] {
+            width: 80px;
+            height: 40px;
+            font-size: 20px;
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+        }
+        ul {
+            list-style-type: none;
+            margin-top: 20px;
+            padding-left: 0;
+        }
+        li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+    <h1>聚合搜索</h1>
+    <form action="" method="get" onsubmit="return search()">
+        <input type="text" id="keyword" placeholder="请输入搜索内容">
+        <input type="submit" value="搜索">
+    </form>
+    <ul>
+        <li><a href="https://www.baidu.com/s?wd=" target="_blank">百度</a></li>
+        <li><a href="https://cn.bing.com/search?q=" target="_blank">必应</a></li>
+        <li><a href="https://www.sogou.com/web?query=" target="_blank">搜狗</a></li>
+        <li><a href="https://www.so.com/s?q=" target="_blank">360</a></li>
+    </ul>
+    <script>
+        function search() {
+            var keyword = document.getElementById("keyword").value; //获取输入的关键词
+            if (keyword) { //如果关键词不为空
+                var links = document.getElementsByTagName("a"); //获取所有的链接
+                for (var i = 0; i < links.length; i++) { //遍历链接
+                    var url = links[i].href + keyword; //拼接完整的搜索网址
+                    window.open(url); //在新窗口打开网址
+                }
+            }
+            return false; //阻止表单提交
+        }
+    </script>
+</body>
+</html>
