@@ -1,69 +1,258 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            text-align: center;
-            color: #333333;
-        }
-        form {
-            width: 600px;
-            margin: 0 auto;
-        }
-        input[type=text] {
-            width: 500px;
-            height: 40px;
-            font-size: 20px;
-            border: 1px solid #cccccc;
-            padding: 10px;
-        }
-        input[type=submit] {
-            width: 80px;
-            height: 40px;
-            font-size: 20px;
-            background-color: #ffffff;
-            border: 1px solid #cccccc;
-        }
-        ul {
-            list-style-type: none;
-            margin-top: 20px;
-            padding-left: 0;
-        }
-        li {
-            display: inline-block;
-            margin-right: 10px;
-        }
-        a {
-            text-decoration: none;
-            color: #333333;
-        }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1,user-scalable=no">
+    <title>主页</title>
+    <meta name="keywords" content="青丘">
+    <meta name="description" itemprop="description" content="向日葵在没有太阳的晚上，还有谁向它伸出手。" />
+    <link rel="shortcut icon" href="./img/favicon.ico">
+    <link rel="stylesheet" href="./css/style.css" media="screen" type="text/css">
 </head>
+
 <body>
-    <h1>聚合搜索</h1>
-    <form action="" method="get" onsubmit="return search()">
-        <input type="text" id="keyword" placeholder="请输入搜索内容">
-        <input type="submit" value="搜索">
-    </form>
-    <ul>
-        <li><a href="https://cn.bing.com/search?q=" target="_blank">必应</a></li>
-        <li><a href="https://www.so.com/s?q=" target="_blank">360</a></li>
-    </ul>
-    <script>
-        function search() {
-            var keyword = document.getElementById("keyword").value; //获取输入的关键词
-            if (keyword) { //如果关键词不为空
-                var links = document.getElementsByTagName("a"); //获取所有的链接
-                for (var i = 0; i < links.length; i++) { //遍历链接
-                    var url = links[i].href + keyword; //拼接完整的搜索网址
-                    window.open(url); //在新窗口打开网址
-                }
-            }
-            return false; //阻止表单提交
-        }
-    </script>
+    <div class="wrapper">
+        <div class="main">
+            <div class="container">
+                <div class="intro">
+                    <div class="user-warp img">
+                        <img src="http://q1.qlogo.cn/g?b=qq&nk=149749000&s=640" alt="青丘艾">
+                    </div>
+                    <div class="nickname">青丘艾</div>
+                    <div class="description">
+                        <p>“既然不懂什么是珍惜，那么我教你，从失去开始”</p>
+                    </div>
+                    <div class="zuobiao">
+                        <i class="ico_map"></i>
+                        <span>中国</span>
+                        <span style="margin-left: 10px;">
+                            <input id="switch_default" type="checkbox" class="switch_default">
+                            <label for="switch_default" class="toggleBtn"></label>
+                        </span>
+                    </div>
+                    <div class="menu navbar-right links">
+                        <a class="menu-item" href="/">首页</a> ·
+                        <a href="#">博客</a>
+                        <center>
+                            <div id="header"></div>
+                            <div id="main">
+                                <div class="demo">
+                                    <div id="player3" class="aplayer">
+                                        <pre class="aplayer-lrc-content">
+[00:00.00]来一碗老于 - 解药(新版)
+[00:00.00]作词：口袋易百
+[00:00.00]作曲：颜小健、郑国锋
+[00:00.00]制作人：颜小健@Jyken
+[00:00.00]编曲：你的美
+[00:00.00]混音：裴东文
+[00:00.00]推广：张作全、朱佳莉、徐招祥
+[00:00.00]艺人统筹 ：黄婷
+[00:00.83]原唱：颜小健、郑国锋
+[00:00.83]出品：J.T Music Studio
+[00:00.83]（未经许可，不得翻唱翻录或使用）
+[00:00.83]咖啡店等了一整夜夜夜夜
+[00:05.23]你还是没有出现
+[00:18.99]行驶在城市的边缘
+[00:22.26]故意把情绪抛很远
+[00:28.04]电台音乐夹杂眼泪
+[00:31.42]切歌之前假装看不见
+[00:36.87]天鹅湖转了一个圈圈圈圈
+[00:41.67]从起点回到了终点
+[00:46.11]咖啡店等了一整夜夜夜夜
+[00:50.87]你还是没有出现
+[00:54.36]就在昨天爱悄然离线
+[00:58.80]等到的只是冷却的留言
+[01:03.46]说了道歉也不能澄清一切
+[01:08.00]我陷入黑色的空间
+[01:12.50]再见雨天爱越走越远
+[01:17.15]解药遗失在梦破晓之前
+[01:21.74]闭上双眼心里还是会默念
+[01:26.29]老地方出现我忘返流连
+[01:41.34]行驶在城市的边缘
+[01:44.68]故意把情绪抛很远
+[01:50.31]电台音乐夹杂眼泪
+[01:53.64]切歌之前假装看不见
+[01:59.30]天鹅湖转了一个圈圈圈圈
+[02:03.95]从起点回到了终点
+[02:08.35]咖啡店等了一整夜夜夜夜
+[02:13.10]你还是没有出现
+[02:16.58]就在昨天爱悄然离线
+[02:21.09]等到的只是冷却的留言
+[02:25.65]说了道歉也不能澄清一切
+[02:30.29]我陷入黑色的空间
+[02:34.84]再见雨天爱越走越远
+[02:39.34]解药遗失在梦破晓之前
+[02:43.99]闭上双眼心里还是会默念
+[02:48.54]老地方出现我忘返流连
+[02:53.29]就在昨天爱悄然离线
+[02:57.69]等到的只是冷却的留言
+[03:02.19]说了道歉也不能澄清一切
+[03:06.79]我陷入黑色的空间
+[03:11.30]再见雨天爱越走越远
+[03:15.90]解药遗失在梦破晓之前
+[03:20.55]闭上双眼心里还是会默念
+[03:25.10]老地方出现我忘返流连
+</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </center>
+                    </div>
+                    <div style=" line-height: 20px;font-size: 9pt;">
+                        <p>"向日葵在没有太阳的晚上，还有谁向它伸出手。"</p>
+                        <p style="margin-left: 8rem;font-size: 8pt;"><small>—— 青丘艾</small></p>
+                    </div>
+                    <br>
+                    <center>
+                        <ul id="donateBox" class="list pos-f tr3">
+                            <li id="AliPay">AliPay</li>
+                            <li id="WeChat">WeChat</li>
+                            <li id="QQ">QQ</li>
+                        </ul>
+                        <div id="QRBox" class="pos-f left-100">
+                            <div id="MainBox"></div>
+                        </div>
+                    </center>
+                </div>
+            </div>
+        </div>
+        <footer id="footer" class="footer">
+            <div class="stars">
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+                <div class="star"></div>
+            </div>
+        </footer>
+    </div>
 </body>
+<script src="./js/jquery.min.js"></script>
+<script src="./js/clipboard.min.js"></script>
+<script src="./js/APlayer.js"></script>
+<script>
+$(function(){
+    var QRBox = $('#QRBox');
+    var MainBox = $('#MainBox');
+    var AliPayQR = './img/zfbpay.png';
+    var WeChanQR = './img/wxpay.png';
+    var QQQR = "./img/qqpay.png";
+
+    function showQR(QR) {
+        if (QR) {
+            MainBox.css('background-image', 'url(' + QR + ')');
+        }
+        $('#DonateText,#donateBox,#github').addClass('blur');
+        QRBox.fadeIn(300, function (argument) {
+            MainBox.addClass('showQR');
+        });
+    }
+
+    $('#donateBox>li').click(function (event) {
+        var thisID = $(this).attr('id');
+        if (thisID === 'AliPay') {
+            showQR(AliPayQR);
+        } else if (thisID === 'WeChat') {
+            showQR(WeChanQR);
+        } else if (thisID === 'QQ') {
+            showQR(QQQR);
+        }
+    });
+
+    MainBox.click(function (event) {
+        MainBox.removeClass('showQR').addClass('hideQR');
+        setTimeout(function (a) {
+            QRBox.fadeOut(300, function (argument) {
+                MainBox.removeClass('hideQR');
+            });
+            $('#DonateText,#donateBox,#github').removeClass('blur');
+        }, 600);
+    });
+
+    let ap3 = new APlayer({
+        element: document.getElementById('player3'),//样式1
+        narrow: false,
+        autoplay: false,
+        showlrc: true,
+        preload: 'auto',
+        music: {
+            title: '解药(新版)',
+            author: '来一碗老于',
+            url: './bgm.mp3',
+            pic: './img/tm.png'
+        }
+    });
+    ap3.init();
+    
+    let _Blog = window._Blog || {};
+    const currentTheme = window.localStorage && window.localStorage.getItem('theme');
+    const isDark = currentTheme === 'dark';
+    if (isDark) {
+        document.getElementById("switch_default").checked = true;
+    } else {
+        document.getElementById("switch_default").checked = false;
+    }
+    _Blog.toggleTheme = function () {
+        if (isDark) {
+            document.getElementsByTagName('body')[0].classList.add('dark-theme');
+        } else {
+            document.getElementsByTagName('body')[0].classList.remove('dark-theme');
+        }
+        document.getElementsByClassName('toggleBtn')[0].addEventListener('click', () => {
+            if (document.getElementsByTagName('body')[0].classList.contains('dark-theme')) {
+                document.getElementsByTagName('body')[0].classList.remove('dark-theme');
+            } else {
+                document.getElementsByTagName('body')[0].classList.add('dark-theme');
+            }
+            window.localStorage && window.localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light',)
+        })
+    };
+    _Blog.toggleTheme();
+})
+</script>
 </html>
