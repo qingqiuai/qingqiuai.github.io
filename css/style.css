@@ -3744,27 +3744,27 @@ background-color: #FBFBFB;
 }
 
 #donateBox #QQ {
-    background-image: url(https://qingqiuai.github.io/img/qq.svg);
+    background-image: url(https://qingqiuai.github.io/images/qq.svg);
 }
 
 #donateBox #AliPay {
-    background-image: url(https://qingqiuai.github.io/img/alipay.svg);
+    background-image: url(https://qingqiuai.github.io/images/alipay.svg);
 }
 
 #donateBox #WeChat {
-    background-image: url(https://qingqiuai.github.io/img/wechat.svg);
+    background-image: url(https://qingqiuai.github.io/images/wechat.svg);
 }
 
 .dark-theme #donateBox #QQ {
-    background-image: url(https://qingqiuai.github.io/img/qq1.svg);
+    background-image: url(https://qingqiuai.github.io/images/qq1.svg);
 }
 
 .dark-theme #donateBox #AliPay {
-    background-image: url(https://qingqiuai.github.io/img/alipay1.svg);
+    background-image: url(https://qingqiuai.github.io/images/alipay1.svg);
 }
 
 .dark-theme #donateBox #WeChat {
-    background-image: url(https://qingqiuai.github.io/img/wechat1.svg);
+    background-image: url(https://qingqiuai.github.io/images/wechat1.svg);
 }
 
 #QRBox {
