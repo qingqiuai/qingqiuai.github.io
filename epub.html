@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>显示epub文件</title>
+  <style>
+    /* 你可以在这里添加一些CSS样式 */
+  </style>
+</head>
+<body>
+  <h1>显示epub文件</h1>
+  <!-- 这里是一个容器，用来显示epub文件的内容 -->
+  <div id="container"></div>
+  <!-- 这里是一个脚本，用来处理url和显示epub文件 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/epub.js/0.3.88/epub.min.js"></script>
+  <script>
+    // 获取元素
+    var container = document.getElementById("container");
+    // 定义一个变量，用来存储epub对象
+    var book;
+    // 定义一个函数，用来根据url加载和渲染epub文件
+    function loadEpub(url) {
+      // 创建一个epub对象，传入url作为参数
+      book = ePub(url);
+      // 渲染epub对象到容器中，设置宽度和高度
+      book.renderTo(container, {width: 600, height: 800});
+      // 监听渲染完成的事件
+      book.ready.then(function(){
+        // 获取epub文件的元数据
+        var metadata = book.package.metadata;
+        // 打印元数据到控制台
+        console.log(metadata);
+        // 获取epub文件的目录
+        var toc = book.navigation.toc;
+        // 打印目录到控制台
+        console.log(toc);
+      });
+    }
+    // 定义一个函数，用来获取url参数中的值
+    function getParameterByName(name) {
+      // 获取当前页面的url
+      var url = window.location.href;
+      // 对name进行编码
+      name = name.replace(/[\[\]]/g, '\\$&');
+      // 创建一个正则表达式，匹配name和值
+      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+      // 执行正则表达式，得到结果数组
+      var results = regex.exec(url);
+      // 判断结果数组是否为空
+      if (!results) return null;
+      // 判断结果数组第二个元素是否为空
+      if (!results[2]) return '';
+      // 对结果数组第二个元素进行解码并返回
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+    // 调用获取url参数中的值的函数，传入"url"作为参数，得到epub文件的url
+    var epubUrl = getParameterByName("url");
+    // 判断epubUrl是否为空
+    if (epubUrl) {
+      // 调用加载和渲染epub文件的函数，传入epubUrl作为参数
+      loadEpub(epubUrl);
+    } else {
+      // 提示用户输入正确的url参数
+      alert("请输入正确的url参数");
+    }
+  </script>
+</body>
+</html>
