@@ -63,7 +63,7 @@ a:hover {
     line-height: 1.8;
     margin-right: 6px;
     vertical-align: middle;
-    background-image: url(https://qingqiuai.github.io/images/zuobiao.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/zuobiao.svg);
     background-size: 100%;
     width: 16px;
     height: 16px;
@@ -3744,27 +3744,27 @@ background-color: #FBFBFB;
 }
 
 #donateBox #QQ {
-    background-image: url(https://qingqiuai.github.io/images/qq.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/qq.svg);
 }
 
 #donateBox #AliPay {
-    background-image: url(https://qingqiuai.github.io/images/alipay.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/alipay.svg);
 }
 
 #donateBox #WeChat {
-    background-image: url(https://qingqiuai.github.io/images/wechat.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/wechat.svg);
 }
 
 .dark-theme #donateBox #QQ {
-    background-image: url(https://qingqiuai.github.io/images/qq1.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/qq1.svg);
 }
 
 .dark-theme #donateBox #AliPay {
-    background-image: url(https://qingqiuai.github.io/images/alipay1.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/alipay1.svg);
 }
 
 .dark-theme #donateBox #WeChat {
-    background-image: url(https://qingqiuai.github.io/images/wechat1.svg);
+    background-image: url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/wechat1.svg);
 }
 
 #QRBox {
@@ -3800,7 +3800,7 @@ background-color: #FBFBFB;
     height: 24px;
     left: calc(50% + 135px);
     top: calc(50% - 30px);
-    background: no-repeat center center url(https://cdn.jsdelivr.net/gh/nuoxianCN/cdn@1.0.4/pay/images/github.svg);
+    background: no-repeat center center url(https://fastly.jsdelivr.net/gh/qingqiuai/qingqiuai.github.io@main/images/github.svg);
     background-size: contain;
     opacity: 0.3;
     transform: rotatez(15deg);
