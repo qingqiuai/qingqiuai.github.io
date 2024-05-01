@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>漫画阅读器</title>
+    <style>
+        #comic {
+            overflow-y: scroll;
+            overflow-x: hidden;
+            white-space: normal;
+            height: 600px; /* 根据需要调整 */
+        }
+        .comic-page {
+            page-break-after: always;
+            padding: 10px;
+            text-align: center;
+        }
+        .comic-page img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #loading {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">加载中...</div>
+    <div id="comic"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var comicUrl = urlParams.get('comic_url');
+        var currentPageIndex = 0;
+        var pageCount = 0;
+        var comicContainer = document.getElementById("comic");
+        var loadingElement = document.getElementById("loading");
+
+        function loadComic() {
+            loadingElement.style.display = 'block';
+            fetch(comicUrl)
+                .then(response => response.blob())
+                .then(blob => JSZip.loadAsync(blob))
+                .then(zip => {
+                    var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
+                    pageCount = filenames.length;
+                    filenames.forEach(filename => {
+                        displayImage(filename, zip);
+                    });
+                    loadingElement.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("加载漫画失败");
+                });
+        }
+
+        function displayImage(filename, zip) {
+            var pageDiv = document.createElement("div");
+            pageDiv.className = "comic-page";
+            var img = zip.file(filename).async("base64");
+            img.then(function(base64) {
+                var imgElement = new Image();
+                imgElement.src = "data:image/jpeg;base64," + base64;
+                pageDiv.appendChild(imgElement);
+                if (comicContainer.firstChild) {
+                    comicContainer.insertBefore(pageDiv, comicContainer.firstChild);
+                } else {
+                    comicContainer.appendChild(pageDiv);
+                }
+            }).catch(function(error) {
+                console.error('Error:', error);
+            });
+        }
+
+        // 监听滚动事件，以便加载上一张或下一张图片
+        comicContainer.addEventListener('scroll', function() {
+            var scrollTop = comicContainer.scrollTop;
+            var scrollHeight = comicContainer.scrollHeight;
+            var clientHeight = comicContainer.clientHeight;
+
+            // 如果滚动到接近容器顶部，加载上一张图片
+            if (scrollTop <= 0) {
+                if (currentPageIndex > 0) {
+                    var prevPageFilename = Object.keys(zip.files)[currentPageIndex - 1];
+                    displayImage(prevPageFilename, zip);
+                    currentPageIndex--;
+                }
+            }
+
+            // 如果滚动到接近容器底部，加载下一张图片
+            if (scrollTop + clientHeight >= scrollHeight) {
+                if (currentPageIndex < pageCount - 1) {
+                    var nextPageFilename = Object.keys(zip.files)[currentPageIndex + 1];
+                    displayImage(nextPageFilename, zip);
+                    currentPageIndex++;
+                }
+            }
+        });
+
+        // 页面加载后自动加载漫画
+        loadComic();
+    </script>
+</body>
+</html>
