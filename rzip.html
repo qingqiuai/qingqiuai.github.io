@@ -28,7 +28,7 @@
 <body>
     <div id="loading">加载中...</div>
     <div id="comic"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="<url id="" type="url" status="" title="" wc="">https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script></url> 
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
@@ -44,15 +44,10 @@
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zip => {
                     var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    // 确保文件名按顺序排序
-                    filenames.sort((a, b) => {
-                        var numA = parseInt(a.replace(/[^0-9]/g, ''), 10);
-                        var numB = parseInt(b.replace(/[^0-9]/g, ''), 10);
-                        return numA - numB;
-                    });
                     pageCount = filenames.length;
-                    // 从第一张图片开始加载
-                    displayImage(filenames[currentPageIndex], zip);
+                    filenames.forEach(filename => {
+                        displayImage(filename, zip);
+                    });
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
@@ -64,14 +59,16 @@
         function displayImage(filename, zip) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
-            // 异步加载图片数据
             var img = zip.file(filename).async("base64");
             img.then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
                 pageDiv.appendChild(imgElement);
-                // 始终将新页面添加到容器的末尾
-                comicContainer.appendChild(pageDiv);
+                if (comicContainer.firstChild) {
+                    comicContainer.insertBefore(pageDiv, comicContainer.firstChild);
+                } else {
+                    comicContainer.appendChild(pageDiv);
+                }
             }).catch(function(error) {
                 console.error('Error:', error);
             });
