@@ -45,14 +45,18 @@
                 .then(response => response.blob())
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
-                    zip = zipFile; // 更新全局变量zip
-                    var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    filenames.sort(); // 如果文件名已经有序，可以移除此行
-                    pageCount = filenames.length;
-                    // 遍历filenames并显示所有图片
-                    filenames.forEach(filename => {
-                        displayImage(filename, zip);
+                    zip = zipFile;
+                    var filenamesLocal = Object.keys(zip.files).filter(name => !zip.files[name].dir);
+                    filenamesLocal.sort((a, b) => {
+                        // 移除非数字字符并转换为数字进行排序
+                        return parseInt(a.replace(/\D/g, '')) - parseInt(b.replace(/\D/g, ''));
                     });
+                    pageCount = filenamesLocal.length;
+                    filenames = filenamesLocal; // 更新全局变量filenames
+                    // 加载第一张图片
+                    if (filenames.length > 0) {
+                        displayImage(filenames[currentPageIndex], zip);
+                    }
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
@@ -81,9 +85,8 @@
             var scrollTop = comicContainer.scrollTop;
             var scrollHeight = comicContainer.scrollHeight;
             var clientHeight = comicContainer.clientHeight;
-    
-            // 检查是否到达底部并加载下一张图片
-            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100是经验值，用于提前加载下一张图片
+
+            if (scrollTop + clientHeight >= scrollHeight - 100) {
                 if (currentPageIndex < pageCount - 1) {
                     currentPageIndex++; // 更新当前页面索引
                     var nextPageFilename = filenames[currentPageIndex];
