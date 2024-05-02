@@ -46,10 +46,8 @@
                 .then(zipFile => {
                     zip = zipFile;
                     var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    // 使用正则表达式提取文件名中的数字，并根据这些数字进行排序
-                    filenames.sort((a, b) => {
-                        return parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10);
-                    });
+                    // 文件名已经是数字顺序，直接排序
+                    filenames.sort();
                     pageCount = filenames.length;
                     // 预先加载一些图片以便于滚动时使用
                     loadNextImages(5); // 这里加载前5张图片作为起始
@@ -75,10 +73,16 @@
         }
 
         function loadNextImages(count) {
-            for (var i = currentPageIndex; i < currentPageIndex + count && i < pageCount; i++) {
-                displayImage(filenames[i], zip);
-            }
-            currentPageIndex += count;
+            var loadCount = 0;
+            var loadNext = () => {
+                if (currentPageIndex < pageCount && loadCount < count) {
+                    displayImage(filenames[currentPageIndex], zip);
+                    currentPageIndex++;
+                    loadCount++;
+                    setTimeout(loadNext, 10); // 很小的延迟来连续加载图片
+                }
+            };
+            loadNext();
         }
 
         comicContainer.addEventListener('scroll', function() {
@@ -87,7 +91,9 @@
             var clientHeight = comicContainer.clientHeight;
 
             if (scrollTop + clientHeight >= scrollHeight - 100) { // 100px提前加载下一批图片
-                loadNextImages(3); // 加载下一批3张图片
+                if (currentPageIndex < pageCount) {
+                    loadNextImages(3); // 加载下一批3张图片
+                }
             }
         });
 
