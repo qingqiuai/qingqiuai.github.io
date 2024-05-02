@@ -53,14 +53,14 @@
         }
 
         function displayImages() {
+            // 获取排序后的文件名数组
+            var sortedFilenames = Object.keys(zip.files).filter(name => !zip.files[name].dir).sort();
             // 清空漫画容器
             comicContainer.innerHTML = '';
-            // 假设我们一次加载5张图片
-            var imagesToLoad = 5;
-            for (var i = currentPageIndex; i < currentPageIndex + imagesToLoad && i < getZipFilenames().length; i++) {
-                displayImage(getZipFilenames()[i], i);
-            }
-            currentPageIndex += imagesToLoad;
+            // 遍历文件名数组，加载并显示图片
+            sortedFilenames.forEach(filename => {
+                displayImage(filename, zip);
+            });
         }
 
         function getZipFilenames() {
@@ -68,20 +68,24 @@
             return Object.keys(zip.files).filter(name => !zip.files[name].dir).sort((a, b) => a.localeCompare(b));
         }
 
-        function displayImage(filename, index) {
+        function displayImage(filename, zipObject) {
+            // 创建一个新页面容器
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
-            zip.file(filename).async("base64").then(function(base64) {
+            // 异步加载并显示图片
+            zipObject.file(filename).async("base64").then(function(base64) {
+                // 创建一个新的图片元素
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
+                // 当图片加载完成后，将其添加到页面容器中
                 imgElement.onload = function() {
                     pageDiv.appendChild(imgElement);
-                    if (index === 0) { // 第一张图片加载完成后添加到页面
-                        comicContainer.appendChild(pageDiv);
-                    }
+                    // 将页面容器添加到漫画容器中
+                    comicContainer.appendChild(pageDiv);
                 };
             }).catch(function(error) {
-                console.error('Error:', error);
+                // 错误处理
+                console.error('Error loading image:', filename, error);
             });
         }
 
