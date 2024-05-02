@@ -32,8 +32,6 @@
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
-        // 将filenames定义为全局变量
-        var filenames = [];
         var currentPageIndex = 0;
         var pageCount = 0;
         var zip = null; // 将zip作为全局变量
@@ -46,13 +44,16 @@
                 .then(response => response.blob())
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
-                    zip = zipFile;
-                    var filenamesLocal = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    filenamesLocal.sort((a, b) => parseInt(a) - parseInt(b)); // 确保数字顺序排序
-                    pageCount = filenamesLocal.length;
-                    filenames = filenamesLocal; // 更新全局变量filenames
-                    // 预先加载一些图片以便于滚动时使用
-                    loadNextImages(5); // 这里加载前5张图片作为起始
+                    zip = zipFile; // 更新全局变量zip
+                    var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
+                    filenames.sort(); // 如果文件名已经有序，可以移除此行
+                    pageCount = filenames.length;
+                    // 遍历filenames并显示所有图片
+                    /* filenames.forEach(filename => {
+                        displayImage(filename, zip);
+                    }); */
+                    // 加载并显示第一张图片
+                    displayImage(filenames[0], zip);
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
@@ -61,33 +62,62 @@
                 });
         }
 
-        function displayImage(filename) {
+        function displayImage(filename, zip) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
-            var imgElement = new Image();
-            imgElement.onload = function() {
+            zip.file(filename).async("base64").then(function(base64) {
+                var imgElement = new Image();
+                imgElement.src = "data:image/jpeg;base64," + base64;
+                imgElement.onload = function() {
+                    // 当图片加载完成后，再添加到页面中，以确保顺序
+                    pageDiv.appendChild(imgElement);
+                    // 检查是否是第一张图片，如果不是，则在滚动事件中加载
+                    if (filename !== filenames[0]) {
+                        comicContainer.appendChild(pageDiv);
+                    } else {
+                        // 对于第一张图片，直接添加到页面中
+                        comicContainer.innerHTML = ''; // 清空容器
+                        comicContainer.appendChild(pageDiv);
+                    }
+                };
+            }).catch(function(error) {
+                console.error('Error:', error);
+            });
+        }
+        
+        /* function displayImage(filename, zip) {
+            var pageDiv = document.createElement("div");
+            pageDiv.className = "comic-page";
+            // 异步加载图片数据
+            var img = zip.file(filename).async("base64");
+            img.then(function(base64) {
+                var imgElement = new Image();
+                imgElement.src = "data:image/jpeg;base64," + base64;
                 pageDiv.appendChild(imgElement);
-                comicContainer.appendChild(pageDiv); // 添加到容器末尾
-            };
-            imgElement.src = 'path/to/image/' + filename; // 替换为实际的图片路径
+                // 始终将新页面添加到容器的末尾
+                comicContainer.appendChild(pageDiv);
+            }).catch(function(error) {
+                console.error('Error:', error);
+            });
         }
 
-        function loadNextImages(count) {
-            var loadCount = 0;
-            var loadNext = () => {
-                if (currentPageIndex < pageCount && loadCount < count) {
-                    displayImage(filenames[currentPageIndex]);
-                    currentPageIndex++;
-                    loadCount++;
-                    setTimeout(loadNext, 10); // 很小的延迟来连续加载图片
+        // 修改滚动事件监听器
+        comicContainer.addEventListener('scroll', function() {
+            var scrollTop = comicContainer.scrollTop;
+            var scrollHeight = comicContainer.scrollHeight;
+            var clientHeight = comicContainer.clientHeight;
+    
+            // 检查是否到达底部并加载下一张图片
+            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100是经验值，用于提前加载下一张图片
+                if (currentPageIndex < pageCount - 1) {
+                    currentPageIndex++; // 更新当前页面索引
+                    var nextPageFilename = filenames[currentPageIndex];
+                    displayImage(nextPageFilename, zip);
                 }
-            };
-            loadNext();
-        }
-
-        // 移除原有的滚动事件监听器
-        // comicContainer.addEventListener('scroll', function() {...});
-
+            }
+        });
+        */
+    
         // 页面加载后自动加载漫画
         loadComic();
     </script>
