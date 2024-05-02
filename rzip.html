@@ -63,12 +63,21 @@
         function displayImage(filename) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
-            var imgElement = new Image();
-            imgElement.onload = function() {
-                pageDiv.appendChild(imgElement);
-                comicContainer.appendChild(pageDiv);
-            };
-            imgElement.src = URL.createObjectURL(zip.file(filename).async("base64"));
+            zip.file(filename).async("base64").then(function(base64) {
+                var imgElement = new Image();
+                imgElement.src = URL.createObjectURL(base64);
+                imgElement.onload = function() {
+                    pageDiv.appendChild(imgElement);
+                    comicContainer.appendChild(pageDiv);
+                    // 释放ObjectURL
+                    URL.revokeObjectURL(imgElement.src);
+                };
+                imgElement.onerror = function() {
+                    console.error('Error loading image for filename:', filename);
+                };
+            }).catch(function(error) {
+                console.error('Error reading image from zip:', error);
+            });
         }
 
         function loadNextImage() {
@@ -83,7 +92,7 @@
             var scrollHeight = comicContainer.scrollHeight;
             var clientHeight = comicContainer.clientHeight;
 
-            if (scrollTop + clientHeight >= scrollHeight - clientHeight / 2) { // 到达中间时加载下一张图片
+            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100px提前加载下一张图片
                 loadNextImage();
             }
         });
