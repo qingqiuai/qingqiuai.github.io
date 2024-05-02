@@ -54,9 +54,9 @@
                     pageCount = filenamesLocal.length;
                     filenames = filenamesLocal; // 更新全局变量filenames
                     // 加载第一张图片
-                    if (filenames.length > 0) {
-                        displayImage(filenames[currentPageIndex], zip);
-                    }
+                    filenames.forEach(filename => {
+                        displayImage(filename, zip);
+                    });
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
