@@ -32,6 +32,8 @@
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
+        // 将filenames作为全局变量
+        var filenames = [];
         var currentPageIndex = 0;
         var pageCount = 0;
         var zip = null;
@@ -45,8 +47,8 @@
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
                     zip = zipFile;
-                    var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    filenames.sort((a, b) => parseInt(a) - parseInt(b)); // 假设文件名是纯数字
+                    filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
+                    filenames.sort((a, b) => parseInt(a.replace(/\D/g, '')) - parseInt(b.replace(/\D/g, '')));
                     pageCount = filenames.length;
                     // 加载第一张图片
                     loadNextImage();
@@ -81,7 +83,7 @@
             var scrollHeight = comicContainer.scrollHeight;
             var clientHeight = comicContainer.clientHeight;
 
-            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100px提前加载下一张图片
+            if (scrollTop + clientHeight >= scrollHeight - clientHeight / 2) { // 到达中间时加载下一张图片
                 loadNextImage();
             }
         });
