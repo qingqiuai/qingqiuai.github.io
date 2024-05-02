@@ -34,10 +34,10 @@
         var comicUrl = urlParams.get('comic_url');
         var currentPageIndex = 0;
         var pageCount = 0;
-        var zip = null; // 将zip作为全局变量
+        var zip = null;
         var comicContainer = document.getElementById("comic");
         var loadingElement = document.getElementById("loading");
-    
+
         function loadComic() {
             loadingElement.style.display = 'block';
             fetch(comicUrl)
@@ -51,10 +51,8 @@
                         return parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10);
                     });
                     pageCount = filenames.length;
-                    // 由于我们没有特定的当前页码，我们从第一个文件开始显示
-                    if (filenames.length > 0) {
-                        displayImage(filenames[0], zip);
-                    }
+                    // 预先加载一些图片以便于滚动时使用
+                    loadNextImages(5); // 这里加载前5张图片作为起始
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
@@ -62,39 +60,37 @@
                     alert("加载漫画失败");
                 });
         }
+
         function displayImage(filename, zip) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
-            // 异步加载图片数据
-            var img = zip.file(filename).async("base64");
-            img.then(function(base64) {
+            zip.file(filename).async("base64").then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
                 pageDiv.appendChild(imgElement);
-                // 始终将新页面添加到容器的末尾
                 comicContainer.appendChild(pageDiv);
             }).catch(function(error) {
                 console.error('Error:', error);
             });
         }
 
-        // 修改滚动事件监听器
+        function loadNextImages(count) {
+            for (var i = currentPageIndex; i < currentPageIndex + count && i < pageCount; i++) {
+                displayImage(filenames[i], zip);
+            }
+            currentPageIndex += count;
+        }
+
         comicContainer.addEventListener('scroll', function() {
             var scrollTop = comicContainer.scrollTop;
             var scrollHeight = comicContainer.scrollHeight;
             var clientHeight = comicContainer.clientHeight;
-    
-            // 检查是否到达底部并加载下一张图片
-            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100是经验值，用于提前加载下一张图片
-                if (currentPageIndex < pageCount - 1) {
-                    currentPageIndex++; // 更新当前页面索引
-                    var nextPageFilename = filenames[currentPageIndex];
-                    displayImage(nextPageFilename, zip);
-                }
+
+            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100px提前加载下一批图片
+                loadNextImages(3); // 加载下一批3张图片
             }
         });
-    
-        // 页面加载后自动加载漫画
+
         loadComic();
     </script>
 </body>
