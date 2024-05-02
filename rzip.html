@@ -30,13 +30,14 @@
     <div id="comic"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script>
-        // 将filenames作为全局变量
-        var filenames = [];
+        // 从 URL 查询参数中获取漫画的 URL
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
+        // 将filenames和zip作为全局变量
+        var filenames = [];
+        var zip = null;
         var currentPageIndex = 0;
         var pageCount = 0;
-        var zip = null;
         var comicContainer = document.getElementById("comic");
         var loadingElement = document.getElementById("loading");
 
@@ -48,7 +49,8 @@
                 .then(zipFile => {
                     zip = zipFile;
                     filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    filenames.sort((a, b) => parseInt(a.replace(/\D/g, '')) - parseInt(b.replace(/\D/g, '')));
+                    // 直接按照字符串排序，因为文件名是纯数字
+                    filenames.sort();
                     pageCount = filenames.length;
                     // 加载第一张图片
                     loadNextImage();
@@ -66,19 +68,12 @@
             var imgElement = new Image();
             imgElement.onload = function() {
                 pageDiv.appendChild(imgElement);
-                comicContainer.appendChild(pageDiv);
+                comicContainer.appendChild(pageDiv); // 将图片添加到页面中
             };
+            imgElement.src = URL.createObjectURL(zip.file(filename).async("base64"));
             imgElement.onerror = function() {
                 console.error('Error loading image for filename:', filename);
-                // 释放之前创建的 ObjectURL
-                URL.revokeObjectURL(imgElement.src);
             };
-            // 异步读取图片并转换为 base64 格式
-            zip.file(filename).async("base64").then(function(base64) {
-                imgElement.src = URL.createObjectURL(base64);
-            }).catch(function(error) {
-                console.error('Error reading image from zip:', error);
-            });
         }
 
         function loadNextImage() {
@@ -88,16 +83,19 @@
             }
         }
 
+        // 监听滚动事件以加载下一张图片
         comicContainer.addEventListener('scroll', function() {
             var scrollTop = comicContainer.scrollTop;
             var scrollHeight = comicContainer.scrollHeight;
             var clientHeight = comicContainer.clientHeight;
 
-            if (scrollTop + clientHeight >= scrollHeight - 100) { // 100px提前加载下一张图片
+            // 检查是否到达底部并加载下一张图片
+            if (scrollTop + clientHeight >= scrollHeight - clientHeight / 2) {
                 loadNextImage();
             }
         });
 
+        // 页面加载后自动加载漫画
         loadComic();
     </script>
 </body>
