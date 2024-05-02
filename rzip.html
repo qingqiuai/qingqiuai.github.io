@@ -40,7 +40,12 @@
         function loadComic() {
             loadingElement.style.display = 'block';
             fetch(comicUrl)
-                .then(response => response.blob())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zip => {
                     var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
@@ -51,11 +56,10 @@
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert("加载漫画失败");
+                    console.error('Error loading comic:', error);
+                    alert("加载漫画失败: " + error.message);
                 });
         }
-
         function displayImage(filename, zip) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
