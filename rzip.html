@@ -44,14 +44,17 @@
                 .then(response => response.blob())
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
-                    zip = zipFile; // 更新全局变量zip
+                    zip = zipFile;
                     var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    filenames.sort(); // 如果文件名已经有序，可以移除此行
-                    pageCount = filenames.length;
-                    // 遍历filenames并显示所有图片
-                    filenames.forEach(filename => {
-                        displayImage(filename, zip);
+                    // 使用正则表达式提取文件名中的数字，并根据这些数字进行排序
+                    filenames.sort((a, b) => {
+                        return parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10);
                     });
+                    pageCount = filenames.length;
+                    // 由于我们没有特定的当前页码，我们从第一个文件开始显示
+                    if (filenames.length > 0) {
+                        displayImage(filenames[0], zip);
+                    }
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
