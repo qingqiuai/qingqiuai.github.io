@@ -32,6 +32,8 @@
     <script>
         // 将filenames作为全局变量
         var filenames = [];
+        var urlParams = new URLSearchParams(window.location.search);
+        var comicUrl = urlParams.get('comic_url');
         var currentPageIndex = 0;
         var pageCount = 0;
         var zip = null;
