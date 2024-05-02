@@ -60,20 +60,18 @@
                 });
         }
 
-    // 其他函数保持不变...
+        // 加载图片
         function displayImage(filename, zip) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
+            // 异步加载图片数据
             var img = zip.file(filename).async("base64");
             img.then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
                 pageDiv.appendChild(imgElement);
-                if (comicContainer.firstChild) {
-                    comicContainer.insertBefore(pageDiv, comicContainer.firstChild);
-                } else {
-                    comicContainer.appendChild(pageDiv);
-                }
+                // 始终将新页面添加到容器的末尾
+                comicContainer.appendChild(pageDiv);
             }).catch(function(error) {
                 console.error('Error:', error);
             });
