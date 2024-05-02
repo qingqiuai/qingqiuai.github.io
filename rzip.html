@@ -62,10 +62,20 @@
             imgElement.onload = function() {
                 pageDiv.appendChild(imgElement);
                 comicContainer.appendChild(pageDiv);
+                // 释放之前创建的 ObjectURL
+                URL.revokeObjectURL(imgElement.src);
             };
-            imgElement.src = URL.createObjectURL(zip.file(filename).async("base64"));
+            imgElement.onerror = function() {
+                console.error('Error loading image for filename:', filename);
+            };
+            // 异步读取图片并转换为 base64 格式
+            var imgPromise = zip.file(filename).async("base64");
+            imgPromise.then(base64 => {
+                imgElement.src = URL.createObjectURL(base64);
+            }).catch(error => {
+                console.error('Error reading image from zip:', error);
+            });
         }
-
         function loadNextImage() {
             if (currentPageIndex < Object.keys(zip.files).length) {
                 var filename = Object.keys(zip.files)[currentPageIndex];
