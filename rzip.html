@@ -33,26 +33,29 @@
         // 从 URL 查询参数中获取漫画的 URL
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
+        var filenames = [];
         var currentPageIndex = 0;
         var pageCount = 0;
-        var zip = null; // 将zip作为全局变量
+        var zip = null;
         var comicContainer = document.getElementById("comic");
         var loadingElement = document.getElementById("loading");
-    
+
         function loadComic() {
             loadingElement.style.display = 'block';
             fetch(comicUrl)
                 .then(response => response.blob())
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
-                    zip = zipFile; // 更新全局变量zip
-                    var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir);
-                    filenames.sort(); // 如果文件名已经有序，可以移除此行
+                    zip = zipFile;
+                    var filenamesLocal = Object.keys(zip.files).filter(name => !zip.files[name].dir);
+                    // 使用自定义排序函数处理前导零的数字字符串
+                    filenamesLocal.sort((a, b) => parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10));
+                    filenames = filenamesLocal; // 更新全局变量filenames
                     pageCount = filenames.length;
-                    // 遍历filenames并显示所有图片
-                    filenames.forEach(filename => {
-                        displayImage(filename, zip);
-                    });
+                    // 加载第一张图片
+                    if (currentPageIndex < pageCount) {
+                        displayImage(filenames[currentPageIndex], zip);
+                    }
                     loadingElement.style.display = 'none';
                 })
                 .catch(error => {
