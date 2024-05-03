@@ -47,8 +47,7 @@
                 .then(zipFile => {
                     zip = zipFile;
                     filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
-                    const maxLength = 4; // 根据实际情况调整最大长度
-                    filenames.sort((a, b) => fileComparator(a, b, maxLength));
+                    filenames.sort(fileComparator);
                     // 显示所有图片
                     filenames.forEach(filename => {
                         displayImage(filename, zip);
@@ -63,19 +62,18 @@
                 });
         }
 
-        function fileComparator(a, b, maxLength) {
-            var numA = a.replace(/.jpg$/i, '').padStart(maxLength, '0');
-            var numB = b.replace(/.jpg$/i, '').padStart(maxLength, '0');
-            return numA.localeCompare(numB, undefined, {numeric: true});
+        function fileComparator(a, b) {
+            var numA = parseInt(a.match(/(\d+)(\.jpg)$/)[1], 10);
+            var numB = parseInt(b.match(/(\d+)(\.jpg)$/)[1], 10);
+            return numA - numB;
         }
 
         function displayImage(filename, zipObject) {
-            // 异步加载图片数据
+            var pageDiv = document.createElement("div");
+            pageDiv.className = "comic-page";
             zipObject.file(filename).async("base64").then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
-                var pageDiv = document.createElement("div");
-                pageDiv.className = "comic-page";
                 imgElement.onload = function() {
                     pageDiv.appendChild(imgElement);
                     comicContainer.appendChild(pageDiv);
