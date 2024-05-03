@@ -50,7 +50,7 @@
                     filenames.sort((a, b) => fileComparator(a, b));
                     // 遍历filenames并显示所有图片
                     filenames.forEach(filename => {
-                        displayImage(filenames[currentPageIndex], zip);
+                        displayImage(filenames[++currentPageIndex], zip);
                     });
                     loadingElement.style.display = 'none';
                 })
