@@ -5,19 +5,22 @@
     <title>漫画阅读器</title>
     <style>
         #comic {
-            /* overflow-y: scroll; */
             overflow-x: hidden;
             white-space: normal;
-            height: auto; /* 根据需要调整 */
+            height: auto; /* 根据您的iframe高度调整 */
         }
         .comic-page {
-            page-break-after: always;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 10px;
             text-align: center;
         }
         .comic-page img {
             max-width: 100%;
-            max-height: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
         #loading {
             text-align: center;
@@ -28,12 +31,10 @@
 <body>
     <div id="loading">加载中...</div>
     <div id="comic"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script> 
     <script>
-        // 从 URL 查询参数中获取漫画的 URL
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
-        // 将filenames作为全局变量
         var filenames = [];
         var zip = null;
         var comicContainer = document.getElementById("comic");
@@ -47,10 +48,7 @@
                 .then(zipFile => {
                     zip = zipFile;
                     filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
-                    filenames.sort((a, b) => {
-                        return fileComparator(a, b);
-                    });
-                    // 显示所有图片
+                    filenames.sort((a, b) => fileComparator(a, b));
                     displayImages(filenames, zip);
                 })
                 .catch(error => {
@@ -63,31 +61,42 @@
         }
 
         function fileComparator(a, b) {
-            // 使用正则表达式匹配文件名中的数字，并转换为字符串进行排序
-            var numA = a.match(/(\d+)/)[1];
-            var numB = b.match(/(\d+)/)[1];
-            return numA.localeCompare(numB, undefined, {numeric: true});
+            var numA = parseInt(a.replace(/.jpg$/i, ''), 10);
+            var numB = parseInt(b.replace(/.jpg$/i, ''), 10);
+            return numA - numB;
         }
 
         function displayImages(filenames, zipObject) {
+            var imagesLoaded = 0;
+            var imagesTotal = filenames.length;
+
             filenames.forEach(filename => {
-                displayImage(filename, zipObject);
+                displayImage(filename, zipObject, () => {
+                    imagesLoaded++;
+                    if (imagesLoaded === imagesTotal) {
+                        // 所有图片加载完成后，隐藏加载指示
+                        loadingElement.style.display = 'none';
+                    }
+                });
             });
         }
 
-        function displayImage(filename, zipObject) {
+        function displayImage(filename, zipObject, onImageLoaded) {
             var pageDiv = document.createElement("div");
             pageDiv.className = "comic-page";
+            var imgElement = new Image();
+
+            imgElement.onload = function() {
+                pageDiv.appendChild(imgElement);
+                comicContainer.appendChild(pageDiv);
+                onImageLoaded();
+            };
+            imgElement.onerror = function() {
+                console.error('Error loading image:', filename);
+            };
+
             zipObject.file(filename).async("base64").then(function(base64) {
-                var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
-                imgElement.onload = function() {
-                    pageDiv.appendChild(imgElement);
-                    comicContainer.appendChild(pageDiv);
-                };
-                imgElement.onerror = function() {
-                    console.error('Error loading image:', filename);
-                };
             }).catch(function(error) {
                 console.error('Error:', error);
             });
