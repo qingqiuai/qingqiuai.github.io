@@ -34,8 +34,7 @@
         var urlParams = new URLSearchParams(window.location.search);
         var comicUrl = urlParams.get('comic_url');
         // 将filenames作为全局变量
-        var filenames = []; // 声明为全局变量
-        var currentPageIndex = 0;
+        var filenames = [];
         var zip = null;
         var comicContainer = document.getElementById("comic");
         var loadingElement = document.getElementById("loading");
@@ -48,7 +47,9 @@
                 .then(zipFile => {
                     zip = zipFile;
                     filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
-                    filenames.sort(fileComparator);
+                    const maxLength = 4; // 根据实际情况调整最大长度
+                    filenames.sort((a, b) => fileComparator(a, b, maxLength));
+                    // 显示所有图片
                     filenames.forEach(filename => {
                         displayImage(filename, zip);
                     });
@@ -62,19 +63,19 @@
                 });
         }
 
-        function fileComparator(a, b) {
-            // 使用正则表达式匹配文件名中的数字部分
-            var numA = parseInt(a.match(/\d+/)[0], 10);
-            var numB = parseInt(b.match(/\d+/)[0], 10);
-            return numA - numB;
+        function fileComparator(a, b, maxLength) {
+            var numA = a.replace(/.jpg$/i, '').padStart(maxLength, '0');
+            var numB = b.replace(/.jpg$/i, '').padStart(maxLength, '0');
+            return numA.localeCompare(numB, undefined, {numeric: true});
         }
 
         function displayImage(filename, zipObject) {
-            var pageDiv = document.createElement("div");
-            pageDiv.className = "comic-page";
+            // 异步加载图片数据
             zipObject.file(filename).async("base64").then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
+                var pageDiv = document.createElement("div");
+                pageDiv.className = "comic-page";
                 imgElement.onload = function() {
                     pageDiv.appendChild(imgElement);
                     comicContainer.appendChild(pageDiv);
