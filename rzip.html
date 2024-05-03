@@ -63,9 +63,9 @@
         }
 
         function fileComparator(a, b) {
-            // 移除文件扩展名并转换为数字进行比较
-            var numA = parseInt(a.replace(/.jpg$/i, ''), 10);
-            var numB = parseInt(b.replace(/.jpg$/i, ''), 10);
+            // 使用正则表达式匹配文件名中的数字部分
+            var numA = parseInt(a.match(/\d+/)[0], 10);
+            var numB = parseInt(b.match(/\d+/)[0], 10);
             return numA - numB;
         }
 
