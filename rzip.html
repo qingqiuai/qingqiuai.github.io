@@ -38,17 +38,16 @@
         var currentPageIndex = 0;
         var zip = null;
         var comicContainer = document.getElementById("comic");
+        var loadingElement = document.getElementById("loading");
 
         function loadComic() {
+            loadingElement.style.display = 'block';
             fetch(comicUrl)
                 .then(response => response.blob())
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
                     zip = zipFile;
-                    filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
-                    // 使用自定义排序函数处理前导零的数字字符串
-                    filenames.sort((a, b) => fileComparator(a, b));
-                    // 加载第一张图片
+                    filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg')).sort();
                     if (filenames.length > 0) {
                         displayImage(filenames[currentPageIndex], zip);
                     }
@@ -56,48 +55,56 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert("加载漫画失败");
+                })
+                .finally(() => {
+                    loadingElement.style.display = 'none';
                 });
         }
 
-        function fileComparator(a, b) {
-            var aName = a.replace(/.jpg$/, ''); // 移除扩展名
-            var bName = b.replace(/.jpg$/, '');
-            return parseInt(aName) - parseInt(bName);
-        }
-
-        // 监听滚动事件以加载下一张图片
-        comicContainer.addEventListener('scroll', function() {
-            var scrollTop = comicContainer.scrollTop;
-            var scrollHeight = comicContainer.scrollHeight;
-            var clientHeight = comicContainer.clientHeight;
-        
-            // 当用户滚动到足够底部时加载下一张图片
-            if (scrollTop + clientHeight >= scrollHeight - clientHeight / 2 && currentPageIndex < filenames.length - 1) {
-                // 加载下一张图片
-                displayImage(filenames[currentPageIndex + 1], zip);
-                // 更新当前页码索引
-                currentPageIndex++;
-            }
-        });
-        
-        // 显示图片的函数，现在它将添加图片到页面中
         function displayImage(filename, zipObject) {
+            loadingElement.style.display = 'block';
             zipObject.file(filename).async("base64").then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
                 var pageDiv = document.createElement("div");
                 pageDiv.className = "comic-page";
                 imgElement.onload = function() {
-                    // 当图片加载完成后，将其添加到漫画容器中
                     pageDiv.appendChild(imgElement);
                     comicContainer.appendChild(pageDiv);
+                    loadingElement.style.display = 'none';
+                    // 检查是否需要预加载下一张图片
+                    if (currentPageIndex < filenames.length - 1) {
+                        preloadNextImage(filenames[currentPageIndex + 1], zip);
+                    }
                 };
             }).catch(function(error) {
                 console.error('Error:', error);
             });
         }
-        
-        // 页面加载后自动加载第一张图片
+
+        function preloadNextImage(nextFilename, zipObject) {
+            if (currentPageIndex < filenames.length - 1) {
+                zipObject.file(nextFilename).async("base64").then(function(base64) {
+                    var imgElement = new Image();
+                    imgElement.src = "data:image/jpeg;base64," + base64;
+                    // 预加载但不显示下一张图片
+                }).catch(function(error) {
+                    console.error('Error preloading image:', error);
+                });
+            }
+        }
+
+        comicContainer.addEventListener('scroll', function() {
+            var scrollTop = comicContainer.scrollTop;
+            var scrollHeight = comicContainer.scrollHeight;
+            var clientHeight = comicContainer.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - clientHeight / 2 && currentPageIndex < filenames.length - 1) {
+                currentPageIndex++;
+                displayImage(filenames[currentPageIndex], zip);
+            }
+        });
+
         loadComic();
     </script>
 </body>
