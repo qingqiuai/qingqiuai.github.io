@@ -48,8 +48,11 @@
                     filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
                     // 使用自定义排序函数处理前导零的数字字符串
                     filenames.sort((a, b) => fileComparator(a, b));
-                    // 加载第一张图片
-                    displayImage(filenames[currentPageIndex], zip);
+                    // 遍历filenames并显示所有图片
+                    filenames.forEach(filename => {
+                        displayImage(filename, zip);
+                    });
+                    loadingElement.style.display = 'none';
                 })
                 .catch(error => {
                     console.error('Error:', error);
