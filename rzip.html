@@ -47,10 +47,12 @@
                 .then(blob => JSZip.loadAsync(blob))
                 .then(zipFile => {
                     zip = zipFile;
-                    filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg')).sort();
-                    if (filenames.length > 0) {
-                        displayImage(filenames[currentPageIndex], zip);
-                    }
+                    filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
+                    filenames.sort((a, b) => fileComparator(a, b));
+                    // 显示所有图片
+                    filenames.forEach(filename => {
+                        displayImage(filename, zip);
+                    });
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -61,49 +63,22 @@
                 });
         }
 
+        function fileComparator(a, b) {
+            return parseInt(a.replace(/\D/g, ''), 10) - parseInt(b.replace(/\D/g, ''), 10);
+        }
+
         function displayImage(filename, zipObject) {
-            loadingElement.style.display = 'block';
+            var pageDiv = document.createElement("div");
+            pageDiv.className = "comic-page";
             zipObject.file(filename).async("base64").then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
-                var pageDiv = document.createElement("div");
-                pageDiv.className = "comic-page";
-                imgElement.onload = function() {
-                    pageDiv.appendChild(imgElement);
-                    comicContainer.appendChild(pageDiv);
-                    loadingElement.style.display = 'none';
-                    // 检查是否需要预加载下一张图片
-                    if (currentPageIndex < filenames.length - 1) {
-                        preloadNextImage(filenames[currentPageIndex + 1], zip);
-                    }
-                };
+                pageDiv.appendChild(imgElement);
+                comicContainer.appendChild(pageDiv);
             }).catch(function(error) {
                 console.error('Error:', error);
             });
         }
-
-        function preloadNextImage(nextFilename, zipObject) {
-            if (currentPageIndex < filenames.length - 1) {
-                zipObject.file(nextFilename).async("base64").then(function(base64) {
-                    var imgElement = new Image();
-                    imgElement.src = "data:image/jpeg;base64," + base64;
-                    // 预加载但不显示下一张图片
-                }).catch(function(error) {
-                    console.error('Error preloading image:', error);
-                });
-            }
-        }
-
-        comicContainer.addEventListener('scroll', function() {
-            var scrollTop = comicContainer.scrollTop;
-            var scrollHeight = comicContainer.scrollHeight;
-            var clientHeight = comicContainer.clientHeight;
-
-            if (scrollTop + clientHeight >= scrollHeight - clientHeight / 2 && currentPageIndex < filenames.length - 1) {
-                currentPageIndex++;
-                displayImage(filenames[currentPageIndex], zip);
-            }
-        });
 
         loadComic();
     </script>
