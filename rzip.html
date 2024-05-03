@@ -48,11 +48,10 @@
                     filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && name.endsWith('.jpg'));
                     // 使用自定义排序函数处理前导零的数字字符串
                     filenames.sort((a, b) => fileComparator(a, b));
-                    // 遍历filenames并显示所有图片
-                    filenames.forEach(filename => {
-                        displayImage(filenames[++currentPageIndex], zip);
-                    });
-                    loadingElement.style.display = 'none';
+                    // 加载第一张图片
+                    if (filenames.length > 0) {
+                        displayImage(filenames[currentPageIndex], zip);
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -67,28 +66,44 @@
         }
 
         function displayImage(filename, zipObject) {
+            var pageDiv = document.createElement("div");
+            pageDiv.className = "comic-page";
             zipObject.file(filename).async("base64").then(function(base64) {
                 var imgElement = new Image();
                 imgElement.src = "data:image/jpeg;base64," + base64;
-                var pageDiv = document.createElement("div");
-                pageDiv.className = "comic-page";
                 imgElement.onload = function() {
                     pageDiv.appendChild(imgElement);
                     comicContainer.appendChild(pageDiv);
+                    // 检查是否需要加载下一张图片
+                    if (currentPageIndex < filenames.length - 1) {
+                        var nextFilename = filenames[currentPageIndex + 1];
+                        var shouldLoadNext = checkIfLoadNextImage(nextFilename);
+                        if (shouldLoadNext) {
+                            displayImage(nextFilename, zip);
+                        }
+                    }
                 };
             }).catch(function(error) {
                 console.error('Error:', error);
             });
         }
 
+        // 检查是否需要加载下一张图片
+        function checkIfLoadNextImage(nextFilename) {
+            // 这里可以添加逻辑，比如检查用户滚动的位置
+            // 为了示例，这里默认返回true
+            return true;
+        }
+
         // 监听滚动事件以加载下一张图片
         comicContainer.addEventListener('scroll', function() {
-            var clientHeight = comicContainer.clientHeight;
-            var scrollHeight = comicContainer.scrollHeight;
             var scrollTop = comicContainer.scrollTop;
+            var scrollHeight = comicContainer.scrollHeight;
+            var clientHeight = comicContainer.clientHeight;
 
             if (scrollTop + clientHeight >= scrollHeight - 100 && currentPageIndex < filenames.length - 1) {
-                displayImage(filenames[++currentPageIndex], zip);
+                currentPageIndex++;
+                displayImage(filenames[currentPageIndex], zip);
             }
         });
 
