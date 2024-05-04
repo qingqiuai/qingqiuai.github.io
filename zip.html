@@ -78,6 +78,7 @@
                 });
             });
 
+            // 等待所有图片加载完成
             Promise.all(promises)
                 .then(images => {
                     loadingElement.style.display = 'none';
@@ -92,13 +93,6 @@
                     console.error('Error loading images:', error);
                     alert("加载图片失败");
                 });
-        }
-            // 等待所有图片加载完成
-            Promise.all(promises).then(() => {
-                loadingElement.style.display = 'none';
-                // 默认显示第一张图片
-                comicContainer.querySelector(".comic-page").scrollIntoView();
-            });
         }
 
         // 监听键盘事件实现翻页
