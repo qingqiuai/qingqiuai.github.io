@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>漫画阅读器</title>
+    <!--
     <style>
         #comic {
             width: 880px; /* 设置固定宽度 */
@@ -23,6 +24,31 @@
         #loading {
             text-align: center;
             margin-top: 20px;
+        }
+    </style>
+    -->
+    <style>
+        #comic {
+            width: 880px; /* 固定宽度 */
+            height: auto; /* 自动高度，根据内容调整 */
+            margin: 0 auto; /* 水平居中 */
+            overflow: hidden; /* 隐藏溢出内容 */
+            display: flex; /* 使用弹性盒子布局 */
+            flex-direction: column; /* 设置为垂直方向 */
+            align-items: center; /* 垂直居中 */
+            justify-content: flex-start; /* 水平起始对齐 */
+        }
+        
+        .comic-page {
+            margin: 0; /* 移除默认外边距 */
+            padding: 0; /* 移除默认内边距 */
+            text-align: center; /* 使图片在容器中居中 */
+        }
+        
+        .comic-page img {
+            max-width: 100%; /* 图片最大宽度为页面宽度 */
+            height: auto; /* 图片高度自适应 */
+            display: block; /* 移除图片默认的行内间距 */
         }
     </style>
 </head>
