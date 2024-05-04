@@ -58,35 +58,39 @@
             var comicContainer = document.getElementById("comic");
             var loadingElement = document.getElementById("loading");
         
+            // 获取并排序图片文件名
             var filenames = Object.keys(zip.files).filter(name => 
                 !zip.files[name].dir && /\.(jpg|jpeg|png|gif)$/i.test(name)
             );
             filenames.sort();
         
             var promises = filenames.map(filename => {
-                // 确保文件存在于 ZIP 中
-                if (!zip.files[filename]) {
-                    return Promise.reject(new Error(`File ${filename} does not exist in the zip`));
-                }
                 return zip.file(filename).async("base64").then(base64 => {
                     var img = new Image();
                     img.src = "data:image/jpeg;base64," + base64;
                     return new Promise((resolve, reject) => {
-                        img.onload = resolve;
-                        img.onerror = () => reject(new Error(`Failed to load image: ${filename}`));
+                        img.onload = () => {
+                            // 图片加载成功
+                            resolve(img);
+                        };
+                        img.onerror = () => {
+                            // 图片加载失败
+                            reject(new Error(`Failed to load image: ${filename}`));
+                        };
                     });
                 });
             });
-
-            // 等待所有图片加载完成
+        
             Promise.all(promises)
                 .then(images => {
                     loadingElement.style.display = 'none';
-                    images.forEach(img => {
+                    images.forEach((img, index) => {
                         var pageDiv = document.createElement("div");
                         pageDiv.className = "comic-page";
                         pageDiv.appendChild(img);
                         comicContainer.appendChild(pageDiv);
+                        // 释放单个图片的 ObjectURL
+                        URL.revokeObjectURL(img.src);
                     });
                 })
                 .catch(error => {
