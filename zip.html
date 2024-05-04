@@ -5,16 +5,20 @@
     <title>漫画阅读器</title>
     <style>
         #comic {
-            width: 100%;
-            height: auto; /* 根据需要调整 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            width: 880px; /* 设置固定宽度 */
+            margin: 0 auto; /* 使容器在页面中居中 */
+            overflow: hidden; /* 隐藏溢出内容 */
+            white-space: normal; /* 允许正常换行 */
         }
-        #comic img {
-            max-width: 100%;
-            max-height: 100%;
+        .comic-page {
+            width: 100%; /* 每一页的宽度 */
+            padding: 10px; /* 每一页的内边距 */
+            text-align: center; /* 使图片在页面中居中 */
+            page-break-after: always; /* 每一页后添加分页 */
+        }
+        .comic-page img {
+            max-width: 100%; /* 图片最大宽度为页面宽度 */
+            height: auto; /* 图片高度自适应 */
         }
         #loading {
             text-align: center;
