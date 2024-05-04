@@ -1,84 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>Zip漫画阅读器</title>
-	<!-- 加载JSZip库 -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
-	<!-- <script src="comic-reader.js"></script> -->
+    <meta charset="UTF-8">
+    <title>漫画阅读器</title>
+    <style>
+        #comic {
+            width: 100%;
+            height: auto; /* 根据需要调整 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        #comic img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #loading {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-	<canvas id="canvas" width="800" height="600"></canvas>
-	<script>
-		// 加载zip压缩包
-		var urlParams = new URLSearchParams(window.location.search);
-		var comicUrl = urlParams.get('comic_url');
-		var currentPage = 0;
-		var zip = new JSZip();
-		var imgList = [];
+    <div id="loading">加载中...</div>
+    <div id="comic"></div>
+    <!-- 引入 JSZip 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script>
+        // 获取URL参数中的漫画URL
+        var urlParams = new URLSearchParams(window.location.search);
+        var comicUrl = urlParams.get('comic_url');
 
-		// 加载zip文件
-		JSZipUtils.getBinaryContent(comicUrl, function(err, data) {
-			if (err) {
-				console.log(err);
-				return;
-			}
-			zip.loadAsync(data).then(function() {
-				// 获取zip文件中的图片列表
-				zip.forEach(function (relativePath, file) {
-					if (file.dir) return;
-					if (/\.(jpg|png|gif)$/i.test(relativePath)) {
-						imgList.push(relativePath);
-					}
-				});
+        // 加载ZIP文件中的漫画
+        function loadComic(comicUrl) {
+            fetch(comicUrl)
+                .then(response => response.blob())
+                .then(blob => JSZip.loadAsync(blob))
+                .then(zip => loadPages(zip))
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("加载漫画失败");
+                });
+        }
 
-				// 按文件名排序
-				imgList.sort(function(a, b) {
-					return a.localeCompare(b);
-				});
+        // 加载并显示漫画页面
+        function loadPages(zip) {
+            var comicContainer = document.getElementById("comic");
+            var loadingElement = document.getElementById("loading");
 
-				// 显示所有图片
-				showAllPages(imgList);
-			});
-		});
+            // 获取所有文件并筛选图片文件，然后排序
+            var filenames = Object.keys(zip.files).filter(name => !zip.files[name].dir && /\.(jpg|jpeg|png|gif)$/i.test(name));
+            filenames.sort();
 
-		// 显示所有图片
-		function showAllPages(imgList) {
-			var comic = document.getElementById('comic');
-			for (var i = 0; i < imgList.length; i++) {
-				var imgName = imgList[i];
-				zip.file(imgName).async("base64").then(function (data) {
-					var img = document.createElement('img');
-					img.src = 'data:image/jpeg;base64,' + data;
-					comic.appendChild(img);
-				});
-			}
-		}
+            // 异步加载图片并显示
+            var promises = filenames.map(filename => {
+                return zip.file(filename).async("base64").then(base64 => {
+                    var img = new Image();
+                    img.src = "data:image/jpeg;base64," + base64;
+                    return img.onload.then(() => {
+                        var pageDiv = document.createElement("div");
+                        pageDiv.className = "comic-page";
+                        pageDiv.appendChild(img);
+                        comicContainer.appendChild(pageDiv);
+                    });
+                });
+            });
 
-		// 监听键盘事件
-		document.onkeydown = function(event) {
-			event = event || window.event;
-			switch (event.keyCode) {
-				case 37: // 左箭头
-					showPage(currentPage - 1, imgList);
-					break;
-				case 39: // 右箭头
-					showPage(currentPage + 1, imgList);
-					break;
-			}
-		};
+            // 等待所有图片加载完成
+            Promise.all(promises).then(() => {
+                loadingElement.style.display = 'none';
+                // 默认显示第一张图片
+                comicContainer.querySelector(".comic-page").scrollIntoView();
+            });
+        }
 
-		// 显示指定页数的图片
-		function showPage(pageNum, imgList) {
-			if (pageNum < 0 || pageNum >= imgList.length) return;
-			currentPage = pageNum;
-			var imgName = imgList[pageNum];
-			var img = document.querySelector('img[src^="data:image/jpeg;base64"][src*="' + imgName + '"]');
-			if (img) {
-				img.scrollIntoView();
-			}
-		}
-	</script>
+        // 监听键盘事件实现翻页
+        document.addEventListener("keydown", function(event) {
+            var pages = document.querySelectorAll("#comic .comic-page");
+            var currentIndex = Array.prototype.indexOf.call(pages, document.querySelector("#comic .comic-page:visible"));
+            if (event.keyCode === 37) { // 左箭头 - 上一页
+                if (currentIndex > 0) pages[currentIndex - 1].scrollIntoView();
+            } else if (event.keyCode === 39) { // 右箭头 - 下一页
+                if (currentIndex < pages.length - 1) pages[currentIndex + 1].scrollIntoView();
+            }
+        });
+
+        // 页面加载后自动加载漫画
+        loadComic(comicUrl);
+    </script>
 </body>
 </html>
