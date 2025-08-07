@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>起始页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#6366F1',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .search-gradient {
+                background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .glass {
+                @apply bg-white/10 backdrop-blur-md border border-white/20;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 transition-colors duration-300">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- 头部 -->
+        <header class="text-center mb-12 mt-8">
+            <h1 id="time" class="text-[clamp(2rem,5vw,3.5rem)] font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+                00:00:00
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 text-lg">探索世界，从这里开始</p>
+        </header>
+
+        <!-- 搜索区域 -->
+        <div class="max-w-3xl mx-auto mb-16">
+            <div class="relative">
+                <!-- 搜索框 -->
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="输入搜索内容..."
+                    class="w-full px-6 py-4 rounded-full shadow-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-slate-800 dark:text-slate-200"
+                >
+
+                <!-- 搜索按钮 -->
+                <button
+                    id="search-btn"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-full transition-all duration-300 shadow-md hover:shadow-lg"
+                >
+                    <i class="fa fa-search mr-1"></i> 搜索
+                </button>
+            </div>
+
+            <!-- 搜索引擎选择 -->
+            <div class="flex flex-wrap justify-center gap-2 mt-4">
+                <button class="engine-btn active px-3 py-1.5 rounded-full text-sm bg-primary text-white transition-all" data-engine="baidu">
+                    <i class="fa fa-search mr-1"></i>百度
+                </button>
+                <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="google">
+                    <i class="fa fa-google mr-1"></i>谷歌
+                </button>
+                <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="bing">
+                    <i class="fa fa-search mr-1"></i>必应
+                </button>
+                <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="github">
+                    <i class="fa fa-github mr-1"></i>GitHub
+                </button>
+                <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="stackoverflow">
+                    <i class="fa fa-stack-overflow mr-1"></i>StackOverflow
+                </button>
+            </div>
+        </div>
+
+        <!-- 搜索预览区域 -->
+        <div id="preview-container" class="hidden max-w-4xl mx-auto mb-16 bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="font-medium text-slate-800 dark:text-slate-200 flex items-center">
+                    <i id="preview-icon" class="fa fa-search mr-2 text-primary"></i>
+                    <span id="preview-title">搜索预览</span>
+                </h3>
+                <button id="close-preview" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <iframe
+                    id="preview-frame"
+                    class="w-full h-[400px] border-0 rounded-lg"
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                ></iframe>
+            </div>
+        </div>
+
+        <!-- 快捷链接 -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-16">
+            <a href="https://www.baidu.com" target="_blank" class="flex flex-col items-center p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm card-hover border border-slate-200 dark:border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3">
+                    <i class="fa fa-search text-xl text-primary"></i>
+                </div>
+                <span class="text-slate-700 dark:text-slate-300 text-sm">百度</span>
+            </a>
+
+            <a href="https://www.google.com" target="_blank" class="flex flex-col items-center p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm card-hover border border-slate-200 dark:border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3">
+                    <i class="fa fa-google text-xl text-red-500"></i>
+                </div>
+                <span class="text-slate-700 dark:text-slate-300 text-sm">谷歌</span>
+            </a>
+
+            <a href="https://www.bing.com" target="_blank" class="flex flex-col items-center p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm card-hover border border-slate-200 dark:border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3">
+                    <i class="fa fa-search text-xl text-green-600"></i>
+                </div>
+                <span class="text-slate-700 dark:text-slate-300 text-sm">必应</span>
+            </a>
+
+            <a href="https://github.com" target="_blank" class="flex flex-col items-center p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm card-hover border border-slate-200 dark:border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-900/30 flex items-center justify-center mb-3">
+                    <i class="fa fa-github text-xl text-gray-800 dark:text-gray-200"></i>
+                </div>
+                <span class="text-slate-700 dark:text-slate-300 text-sm">GitHub</span>
+            </a>
+
+            <a href="https://stackoverflow.com" target="_blank" class="flex flex-col items-center p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm card-hover border border-slate-200 dark:border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-3">
+                    <i class="fa fa-stack-overflow text-xl text-orange-600"></i>
+                </div>
+                <span class="text-slate-700 dark:text-slate-300 text-sm">StackOverflow</span>
+            </a>
+
+            <a href="https://mail.google.com" target="_blank" class="flex flex-col items-center p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm card-hover border border-slate-200 dark:border-slate-700">
+                <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3">
+                    <i class="fa fa-envelope text-xl text-red-500"></i>
+                </div>
+                <span class="text-slate-700 dark:text-slate-300 text-sm">邮箱</span>
+            </a>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center text-slate-500 dark:text-slate-400 text-sm">
+            <div class="flex justify-center items-center gap-4 mb-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <i class="fa fa-moon-o dark:hidden"></i>
+                    <i class="fa fa-sun-o hidden dark:inline-block"></i>
+                </button>
+
+            </div>
+            <p><a href="https://qingqiuai.github.io/jhss.html">qingqiuai</a>© 2025 起始页 | 聚合搜索</p>
+        </footer>
+    </div>
+
+    <script>
+        // 搜索引擎配置
+        const engines = {
+            baidu: {
+                url: 'https://www.baidu.com/s?wd=',
+                name: '百度',
+                icon: 'fa-search'
+            },
+            google: {
+                url: 'https://www.google.com/search?q=',
+                name: '谷歌',
+                icon: 'fa-google'
+            },
+            bing: {
+                url: 'https://www.bing.com/search?q=',
+                name: '必应',
+                icon: 'fa-bing'
+            },
+            github: {
+                url: 'https://github.com/search?q=',
+                name: 'GitHub',
+                icon: 'fa-github'
+            },
+            stackoverflow: {
+                url: 'https://stackoverflow.com/search?q=',
+                name: 'StackOverflow',
+                icon: 'fa-stack-overflow'
+            }
+        };
+
+        // 当前选中的搜索引擎
+        let currentEngine = 'baidu';
+
+        // DOM 元素
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const engineBtns = document.querySelectorAll('.engine-btn');
+        const previewContainer = document.getElementById('preview-container');
+        const previewFrame = document.getElementById('preview-frame');
+        const previewTitle = document.getElementById('preview-title');
+        const previewIcon = document.getElementById('preview-icon');
+        const closePreview = document.getElementById('close-preview');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        // 初始化主题
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // 搜索引擎切换
+        engineBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有按钮的活跃状态
+                engineBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-primary', 'text-white');
+                    b.classList.add('bg-slate-200', 'dark:bg-slate-700', 'hover:bg-slate-300', 'dark:hover:bg-slate-600');
+                });
+
+                // 设置当前按钮为活跃状态
+                btn.classList.add('active', 'bg-primary', 'text-white');
+                btn.classList.remove('bg-slate-200', 'dark:bg-slate-700', 'hover:bg-slate-300', 'dark:hover:bg-slate-600');
+
+                // 更新当前搜索引擎
+                currentEngine = btn.dataset.engine;
+
+                // 如果输入框有内容，更新预览
+                if (searchInput.value.trim()) {
+                    updatePreview();
+                }
+            });
+        });
+
+        // 搜索功能
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            const engine = engines[currentEngine];
+            window.open(engine.url + encodeURIComponent(query), '_blank');
+        }
+
+        // 搜索按钮点击
+        searchBtn.addEventListener('click', performSearch);
+
+        // 回车键搜索
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // 更新预览
+        function updatePreview() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                previewContainer.classList.add('hidden');
+                return;
+            }
+
+            const engine = engines[currentEngine];
+            previewFrame.src = engine.url + encodeURIComponent(query);
+            previewTitle.textContent = `${engine.name} 搜索: ${query}`;
+            previewIcon.className = `fa ${engine.icon} mr-2 text-primary`;
+            previewContainer.classList.remove('hidden');
+        }
+
+        // 输入框内容变化时更新预览
+        searchInput.addEventListener('input', debounce(updatePreview, 500));
+
+        // 关闭预览
+        closePreview.addEventListener('click', () => {
+            previewContainer.classList.add('hidden');
+        });
+
+        // 主题切换
+        themeToggle.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        // 防抖函数
+        function debounce(func, delay) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
+        // 自动聚焦搜索框
+        window.addEventListener('load', () => {
+            searchInput.focus();
+        });
+    </script>
+
+    <script>
+        // 格式化时间：HH:MM:SS
+        const fmt = d =>
+            d.getHours().toString().padStart(2, '0') + ':' +
+            d.getMinutes().toString().padStart(2, '0') + ':' +
+            d.getSeconds().toString().padStart(2, '0');
+
+        // 首次立即渲染
+        const time = document.getElementById('time');
+        time.textContent = fmt(new Date());
+
+        // 每秒更新一次
+        setInterval(() => time.textContent = fmt(new Date()), 1000);
+    </script>
+</body>
+</html>
