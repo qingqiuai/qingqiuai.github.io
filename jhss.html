@@ -76,13 +76,13 @@
 
             <!-- 搜索引擎选择 -->
             <div class="flex flex-wrap justify-center gap-2 mt-4">
-                <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-primary text-white transition-all" data-engine="baidu">
+                <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="baidu">
                     <i class="fa fa-search mr-1"></i>百度
                 </button>
                 <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="google">
                     <i class="fa fa-google mr-1"></i>谷歌
                 </button>
-                <button class="engine-btn active px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="bing">
+                <button class="engine-btn active px-3 py-1.5 rounded-full text-sm bg-primary text-white transition-all" data-engine="bing">
                     <i class="fa fa-search mr-1"></i>必应
                 </button>
                 <button class="engine-btn px-3 py-1.5 rounded-full text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all" data-engine="github">
@@ -203,7 +203,7 @@
         };
 
         // 当前选中的搜索引擎
-        let currentEngine = 'baidu';
+        let currentEngine = 'bing';
 
         // DOM 元素
         const searchInput = document.getElementById('search-input');
