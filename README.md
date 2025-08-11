@@ -18,14 +18,14 @@
 ## 📸 截图
 | 浅色模式 | 深色模式 |
 |---|---|
-| ![light](https://user-images.githubusercontent.com/placeholder-light.png) | ![dark](https://user-images.githubusercontent.com/placeholder-dark.png) |
-
-> 如需替换截图，把图片上传到 GitHub Issue 后复制链接即可。
+| ![light](https://#) | ![dark](https://#) |
 
 ## 🚀 本地预览
 1. 克隆仓库  
    ```bash
    git clone https://github.com/qingqiuai/qingqiuai.github.io.git
+2. 切换项目
+   ```bash
    cd qingqiuai.github.io
 
 
