@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 NOT FOUND</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+            font-family: "Courier New", Courier, monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 60px;
+        }
+
+        .header {
+            font-size: 48px;
+            letter-spacing: 8px;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #333;
+            margin: 30px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .label {
+            color: #666;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .label-en {
+            font-size: 14px;
+        }
+
+        .label-cn {
+            font-size: 12px;
+            color: #444;
+            font-weight: normal;
+            letter-spacing: 0;
+        }
+
+        .value {
+            color: #999;
+            text-align: right;
+            word-break: break-all;
+            margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .value-en {
+            font-size: 14px;
+        }
+
+        .value-cn {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 0;
+        }
+
+        .value.red {
+            color: #c44;
+        }
+
+        .value.red .value-cn {
+            color: #a33;
+        }
+
+        .value.green {
+            color: #4a4;
+        }
+
+        .value.green .value-cn {
+            color: #3a3;
+        }
+
+        .value.yellow {
+            color: #aa4;
+        }
+
+        .value.yellow .value-cn {
+            color: #883;
+        }
+
+        .value.white {
+            color: #ccc;
+        }
+
+        .value.white .value-cn {
+            color: #888;
+        }
+
+        .value.blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-left: 20px;
+            border-left: 2px solid #333;
+        }
+
+        .footer-text {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-text-cn {
+            color: #444;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">404 NOT FOUND</h1>
+        
+        <div class="divider"></div>
+        
+        <div class="info-row">
+            <span class="label">
+                <span class="label-en">TIMESTAMP:</span>
+                <span class="label-cn">时间戳</span>
+            </span>
+            <span class="value white" id="timestamp">Loading...</span>
+        </div>
+        
+        <div class="info-row">
+            <span class="label">
+                <span class="label-en">PUBLIC IP:</span>
+                <span class="label-cn">公网地址</span>
+            </span>
+            <span class="value blink" id="publicIp">
+                <span class="value-en">DETECTING...</span>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="label">
+                <span class="label-en">LOCAL IP (RTC):</span>
+                <span class="label-cn">本地地址</span>
+            </span>
+            <span class="value blink" id="localIp">
+                <span class="value-en">DETECTING...</span>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="label">
+                <span class="label-en">PROXY/VPN STATUS:</span>
+                <span class="label-cn">代理状态</span>
+            </span>
+            <span class="value blink" id="proxyStatus">
+                <span class="value-en">ANALYZING...</span>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="label">
+                <span class="label-en">CONNECTION TYPE:</span>
+                <span class="label-cn">连接类型</span>
+            </span>
+            <span class="value" id="connType">
+                <span class="value-en">UNKNOWN</span>
+            </span>
+        </div>
+        
+        <div class="info-row">
+            <span class="label">
+                <span class="label-en">USER AGENT:</span>
+                <span class="label-cn">用户代理</span>
+            </span>
+            <span class="value white" id="userAgent">Loading...</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="footer">
+            <div class="footer-text">
+                Request logged.<br>
+                Attempt to access restricted resource detected.
+            </div>
+            <div class="footer-text-cn">
+                请求已记录。<br>
+                检测到尝试访问受限资源。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 状态中文映射表
+        const translations = {
+            // 状态
+            'DETECTING...': '检测中...',
+            'ANALYZING...': '分析中...',
+            'UNKNOWN': '未知',
+            'CLEAN': '清洁',
+            'CHECK FAILED': '检测失败',
+            'UNREACHABLE': '无法访问',
+            'NOT SUPPORTED': '不支持',
+            'FAILED': '失败',
+            'ERROR': '错误',
+            'BLOCKED': '被阻止',
+            'TIMEOUT': '超时',
+            'NONE': '无',
+            'HIDDEN': '隐藏',
+            
+            // 连接类型
+            'DIRECT': '直连',
+            'VPN TUNNEL': 'VPN隧道',
+            'PROXIED CONNECTION': '代理连接',
+            'ANONYMOUS NETWORK': '匿名网络',
+            'WIFI': '无线局域网',
+            'MOBILE DATA': '移动数据',
+            'ETHERNET': '以太网',
+            'WIMAX': 'WiMAX',
+            'BLUETOOTH': '蓝牙',
+            
+            // 代理状态
+            'CHAINED PROXY': '多级代理',
+            'PROXY HEADER': '代理标头',
+            'CDN/PROXY': 'CDN/代理',
+            'RFC7239 PROXY': 'RFC7239代理',
+            'IP MISMATCH (Possible VPN)': 'IP不匹配(可能使用VPN)',
+            'DATACENTER': '数据中心',
+            'VPN TUNNEL': 'VPN隧道',
+            
+            // Local IP 状态
+            'PRIVACY PROTECTED (mDNS)': '隐私保护(mDNS)',
+            'NAT HIDDEN': 'NAT隐藏',
+            'NAT HIDDEN (SRFLX': 'NAT隐藏 (反射地址',
+            'PUBLIC': '公网',
+            'BLOCKED': '被阻止',
+            
+            // 网络类型后缀
+            ' (OS LEVEL)': ' (系统级)',
+            ' hops': ' 跳',
+            
+            // 通用
+            'Loading...': '加载中...'
+        };
+
+        // 翻译函数
+        function translate(text) {
+            if (!text) return '';
+            // 精确匹配
+            if (translations[text]) return translations[text];
+            // 部分匹配（用于带参数的文本）
+            for (const [en, cn] of Object.entries(translations)) {
+                if (text.includes(en)) {
+                    return text.replace(en, cn);
+                }
+            }
+            return '';
+        }
+
+        // 设置双语显示
+        function setBilingualValue(elementId, englishText, colorClass = null) {
+            const el = document.getElementById(elementId);
+            const chineseText = translate(englishText);
+            
+            let html = `<span class="value-en">${englishText}</span>`;
+            if (chineseText && chineseText !== englishText) {
+                html += `<span class="value-cn">${chineseText}</span>`;
+            }
+            
+            el.innerHTML = html;
+            
+            if (colorClass) {
+                el.className = `value ${colorClass}`;
+            } else {
+                el.className = 'value';
+            }
+        }
+
+        // 全局存储检测结果用于交叉验证
+        const detectionResults = {
+            publicIp: null,
+            webrtcPublicIp: null,
+            localIps: [],
+            headers: {},
+            isVpn: false,
+            isProxy: false
+        };
+
+        // 实时更新时间
+        function updateTime() {
+            const now = new Date();
+            const formatted = now.getFullYear() + '-' + 
+                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(now.getDate()).padStart(2, '0') + ' ' + 
+                String(now.getHours()).padStart(2, '0') + ':' + 
+                String(now.getMinutes()).padStart(2, '0') + ':' + 
+                String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('timestamp').textContent = formatted;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // User Agent（保持单行，太长不翻译）
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+
+        // 使用 ifconfig.me 检测网络信息
+        async function detectNetwork() {
+            const publicIpEl = document.getElementById('publicIp');
+            const proxyStatusEl = document.getElementById('proxyStatus');
+            const connTypeEl = document.getElementById('connType');
+            
+            try {
+                // 获取所有信息
+                const allResponse = await fetch('https://ifconfig.me/all.json', {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!allResponse.ok) throw new Error('HTTP ' + allResponse.status);
+                
+                const data = await allResponse.json();
+                detectionResults.headers = data;
+                detectionResults.publicIp = data.ip_addr || data.ip;
+                
+                // 显示 Public IP
+                setBilingualValue('publicIp', detectionResults.publicIp || 'UNKNOWN', 'green');
+
+                // ===== 代理/VPN 检测逻辑 =====
+                let indicators = [];
+                let confidence = 0;
+
+                // 1. 检查代理 Headers
+                const hasForwarded = data.forwarded && data.forwarded.trim() !== '' && data.forwarded !== 'undefined';
+                const hasVia = data.via && data.via.trim() !== '' && data.via !== 'undefined';
+                const hasXForwardedFor = data.x_forwarded_for && data.x_forwarded_for.trim() !== '' && data.x_forwarded_for !== 'undefined';
+                
+                if (hasXForwardedFor) {
+                    const forwardedIps = data.x_forwarded_for.split(',').map(ip => ip.trim());
+                    if (forwardedIps.length > 1) {
+                        indicators.push(`CHAINED PROXY (${forwardedIps.length} hops)`);
+                        confidence += 40;
+                        detectionResults.isProxy = true;
+                    } else {
+                        indicators.push('PROXY HEADER');
+                        confidence += 30;
+                        detectionResults.isProxy = true;
+                    }
+                }
+                
+                if (hasVia) {
+                    const viaLower = data.via.toLowerCase();
+                    if (viaLower.includes('varnish') || viaLower.includes('squid') || viaLower.includes('nginx') || viaLower.includes('cloudflare')) {
+                        indicators.push('CDN/PROXY (' + data.via.split(' ')[0] + ')');
+                        confidence += 25;
+                    } else {
+                        indicators.push('VIA: ' + data.via.substring(0, 20));
+                        confidence += 15;
+                    }
+                    detectionResults.isProxy = true;
+                }
+                
+                if (hasForwarded) {
+                    indicators.push('RFC7239 PROXY');
+                    confidence += 20;
+                    detectionResults.isProxy = true;
+                }
+
+                // 2. WebRTC 公网 IP 比对
+                if (detectionResults.webrtcPublicIp && detectionResults.webrtcPublicIp !== detectionResults.publicIp) {
+                    indicators.push('IP MISMATCH (Possible VPN)');
+                    confidence += 35;
+                    detectionResults.isVpn = true;
+                }
+
+                // 3. 检查数据中心 IP
+                const org = (data.org || '').toLowerCase();
+                const asn = (data.asn || '').toLowerCase();
+                const hostingKeywords = ['amazon', 'aws', 'google cloud', 'gcp', 'azure', 'microsoft', 'digitalocean', 'linode', 'vultr', 'ovh', 'alibaba', 'tencent', 'baidu'];
+                
+                for (const keyword of hostingKeywords) {
+                    if (org.includes(keyword) || asn.includes(keyword)) {
+                        indicators.push('DATACENTER (' + keyword.toUpperCase() + ')');
+                        confidence += 20;
+                        break;
+                    }
+                }
+
+                // 4. 检查 WebRTC Local IP 是否为 VPN 网段
+                const vpnSubnets = ['10.8.', '10.9.', '10.10.', '10.64.', '10.200.', '172.16.'];
+                for (const ip of detectionResults.localIps) {
+                    for (const subnet of vpnSubnets) {
+                        if (ip.startsWith(subnet)) {
+                            indicators.push('VPN TUNNEL (' + ip.substring(0, ip.lastIndexOf('.')) + '.x)');
+                            confidence += 30;
+                            detectionResults.isVpn = true;
+                            break;
+                        }
+                    }
+                }
+
+                // ===== 显示结果 =====
+                if (indicators.length > 0) {
+                    const uniqueIndicators = [...new Set(indicators)];
+                    const statusText = uniqueIndicators.join(' | ');
+                    setBilingualValue('proxyStatus', statusText, confidence >= 50 ? 'red' : 'yellow');
+                    
+                    if (detectionResults.isVpn) {
+                        setBilingualValue('connType', 'VPN TUNNEL', 'red');
+                    } else if (detectionResults.isProxy) {
+                        setBilingualValue('connType', 'PROXIED CONNECTION', 'yellow');
+                    } else {
+                        setBilingualValue('connType', 'ANONYMOUS NETWORK', 'red');
+                    }
+                } else {
+                    setBilingualValue('proxyStatus', 'CLEAN', 'green');
+                    
+                    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                    if (conn && conn.type) {
+                        const typeMap = {
+                            'wifi': 'WIFI',
+                            'cellular': 'MOBILE DATA',
+                            'ethernet': 'ETHERNET',
+                            'wimax': 'WIMAX',
+                            'bluetooth': 'BLUETOOTH',
+                            'vpn': 'VPN (OS LEVEL)'
+                        };
+                        const connType = typeMap[conn.type.toLowerCase()] || conn.type.toUpperCase();
+                        const effective = conn.effectiveType ? ` / ${conn.effectiveType.toUpperCase()}` : '';
+                        const isVpnOs = conn.type === 'vpn';
+                        setBilingualValue('connType', connType + effective, isVpnOs ? 'yellow' : 'green');
+                    } else if (conn && conn.effectiveType) {
+                        setBilingualValue('connType', conn.effectiveType.toUpperCase(), 'green');
+                    } else {
+                        setBilingualValue('connType', 'DIRECT', 'green');
+                    }
+                }
+
+            } catch (error) {
+                console.error('Network detection error:', error);
+                setBilingualValue('publicIp', 'UNREACHABLE', 'red');
+                setBilingualValue('proxyStatus', 'CHECK FAILED', 'red');
+                setBilingualValue('connType', 'UNKNOWN', 'yellow');
+            }
+        }
+
+        // 获取 Local IP (WebRTC)
+        function getLocalIP() {
+            const localIpEl = document.getElementById('localIp');
+            
+            if (!window.RTCPeerConnection) {
+                setBilingualValue('localIp', 'NOT SUPPORTED', 'red');
+                return;
+            }
+
+            const hostCandidates = [];
+            const srflxCandidates = [];
+            let hasMDNS = false;
+            let foundPublic = false;
+            
+            try {
+                const pc = new RTCPeerConnection({
+                    iceServers: [
+                        {urls: 'stun:stun.l.google.com:19302'},
+                        {urls: 'stun:stun1.l.google.com:19302'},
+                        {urls: 'stun:stun2.l.google.com:19302'},
+                        {urls: 'stun:stun3.l.google.com:19302'}
+                    ],
+                    iceCandidatePoolSize: 10
+                });
+                
+                const channel = pc.createDataChannel('ip_detection');
+                
+                pc.createOffer()
+                    .then(offer => pc.setLocalDescription(offer))
+                    .catch(err => {
+                        console.error('WebRTC offer error:', err);
+                        if (hostCandidates.length === 0) {
+                            setBilingualValue('localIp', 'FAILED', 'red');
+                        }
+                    });
+                
+                pc.onicecandidate = (ice) => {
+                    if (!ice || !ice.candidate || !ice.candidate.candidate) {
+                        return;
+                    }
+                    
+                    const candidate = ice.candidate.candidate;
+                    console.log('ICE Candidate:', candidate);
+                    
+                    const typMatch = /typ\s+(\w+)/.exec(candidate);
+                    const ipMatch = /([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/.exec(candidate);
+                    const mDNSMatch = /([a-f0-9-]+\.local)/i.exec(candidate);
+                    
+                    if (!typMatch) return;
+                    
+                    const typ = typMatch[1].toLowerCase();
+                    
+                    if (mDNSMatch && !ipMatch) {
+                        hasMDNS = true;
+                        return;
+                    }
+                    
+                    if (!ipMatch) return;
+                    
+                    const ip = ipMatch[1];
+                    
+                    if (typ === 'host') {
+                        if (ip !== '0.0.0.0' && ip !== '127.0.0.1') {
+                            hostCandidates.push(ip);
+                            detectionResults.localIps.push(ip);
+                            
+                            if (hostCandidates.length === 1) {
+                                setBilingualValue('localIp', ip, 'green');
+                                
+                                const vpnSubnets = ['10.8.', '10.9.', '10.10.', '10.64.', '10.200.'];
+                                for (const subnet of vpnSubnets) {
+                                    if (ip.startsWith(subnet)) {
+                                        detectionResults.isVpn = true;
+                                        const connTypeEl = document.getElementById('connType');
+                                        if (connTypeEl.querySelector('.value-en').textContent === 'UNKNOWN') {
+                                            setBilingualValue('connType', 'VPN TUNNEL', 'red');
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } else if (typ === 'srflx' && !foundPublic) {
+                        srflxCandidates.push(ip);
+                        detectionResults.webrtcPublicIp = ip;
+                        foundPublic = true;
+                        
+                        if (detectionResults.publicIp && detectionResults.publicIp !== ip) {
+                            const proxyStatusEl = document.getElementById('proxyStatus');
+                            if (proxyStatusEl.querySelector('.value-en').textContent === 'CLEAN') {
+                                setBilingualValue('proxyStatus', 'IP MISMATCH (Possible VPN)', 'red');
+                                setBilingualValue('connType', 'VPN TUNNEL', 'red');
+                            }
+                        }
+                    }
+                };
+
+                pc.onicegatheringstatechange = () => {
+                    if (pc.iceGatheringState === 'complete') {
+                        finalizeLocalIp();
+                        pc.close();
+                    }
+                };
+
+                setTimeout(() => {
+                    if (pc.iceGatheringState !== 'complete') {
+                        finalizeLocalIp();
+                        try { pc.close(); } catch(e) {}
+                    }
+                }, 8000);
+
+                function finalizeLocalIp() {
+                    const privateHosts = hostCandidates.filter(ip => 
+                        ip.startsWith('10.') || 
+                        (ip.startsWith('172.') && parseInt(ip.split('.')[1]) >= 16 && parseInt(ip.split('.')[1]) <= 31) ||
+                        ip.startsWith('192.168.')
+                    );
+                    
+                    if (privateHosts.length > 0) {
+                        const display = privateHosts.length === 1 ? privateHosts[0] : privateHosts[0] + ' (+' + (privateHosts.length - 1) + ')';
+                        setBilingualValue('localIp', display, 'green');
+                    } else if (hostCandidates.length > 0) {
+                        const display = hostCandidates[0] + ' (PUBLIC)';
+                        setBilingualValue('localIp', display, 'yellow');
+                    } else if (hasMDNS) {
+                        setBilingualValue('localIp', 'PRIVACY PROTECTED (mDNS)', 'yellow');
+                    } else if (srflxCandidates.length > 0) {
+                        const display = 'NAT HIDDEN (SRFLX: ' + srflxCandidates[0] + ')';
+                        setBilingualValue('localIp', display, 'yellow');
+                    } else {
+                        setBilingualValue('localIp', 'BLOCKED', 'red');
+                    }
+                }
+
+            } catch (e) {
+                console.error('WebRTC error:', e);
+                setBilingualValue('localIp', 'ERROR', 'red');
+            }
+        }
+
+        // 执行检测
+        detectNetwork();
+        getLocalIP();
+    </script>
+</body>
+</html>
